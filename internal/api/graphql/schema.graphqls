@@ -81,9 +81,5 @@ input FilterSatellite {
 # Defines the endpoints to fetch data from 
 type Query {
   hyperquackMeasurements(filter: FilterHyperquack!): Hyperquack!
-}
-
-type Query {
   satelliteMeasurements(filter: FilterSatellite!): Satellite!
 }
-
