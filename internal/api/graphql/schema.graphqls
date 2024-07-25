@@ -3,24 +3,80 @@
 scalar DateTime
 
 type Hyperquack {
-  protocol: String!
+  protocol: String
   domain: String!
   domainIsControl: Boolean
-  date: DateTime!
-  startTime: DateTime!
-  endTime: DateTime!
+  date: DateTime
+  startTime: DateTime
+  endTime: DateTime
   serverIp: String
   serverNetblock: String
-  server_country: String!
+  serverAsn: String
+  serverAsName: String
+  serverAsFullName: String
+  serverAsClass: String
+  server_country: String
+  serverOrganization: String
+  source: String
+  receivedError: String
+  receivedStatus: String
+  receivedHeaders: String
+  receivedBody: String
+  receivedTlsVersion: String
+  ReceviedTlsCipherSuite: String
+  ReceivedTlsCert: String
+  ReceivedTlsCertCommonName: String
+  ReceivedTlsCertAlternativeNames: String
+  ReceivedTlsCertIssuer: String
+  matchesTemplate: Boolean
+  noResponseInMeasurementMatchesTemplate: Boolean
+  controlsFailed: Boolean
+  statefulBlock: Boolean
+
+
 }
 
-input Filter {
+
+type Satellite {
+  domain: String
+  domainIsControl: Boolean
+  testUrl: String
+  date: DateTime
+  startTime: DateTime
+  endTime: DateTime
+  resolverIp: String
+  resolverName: String
+  resolverIsTrusted: Boolean
+  resolverNetblock: String
+  resolverAsn: String
+  resolverAsName: String
+  resolverAsFullName: String 
+  resolverAsClass: String
+  resolverCountry: String
+  resolverOrganization: String
+  receivedError: String
+  receivedRcode: Int
+  source: String
+
+
+}
+
+
+input FilterHyperquack {
   protocol: String!
   domain: String!
+  country: String!
   startTime: DateTime!
   endTime: DateTime!
 }
 
+
+input FilterSatellite {
+  domain: String!
+  resolverCountry: String!
+  startTime: DateTime!
+  endTime: DateTime!
+}
 
 # Defines the endpoints to fetch data from 
 type Query {
