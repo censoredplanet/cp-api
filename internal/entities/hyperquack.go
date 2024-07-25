@@ -4,34 +4,34 @@ import "time"
 
 type Hyperquack struct{
 
-	protocol string
-	domain string
-	domainIsControl bool
-	date time.Time
-	startTime time.Time
-	endTime time.Time
-	serverIp string
-	serverNetblock string
-	serverAsn string
-	serverAsName string
-	serverAsFullName string
-	serverAsClass string
-	server_country string
-	serverOrganization string
-	source string
-	receivedError string
-	receivedStatus string
-	receivedHeaders string
-	receivedBody string
-	receivedTlsVersion string
+	Protocol string
+	Domain string
+	DomainIsControl bool
+	Date time.Time
+	StartTime time.Time
+	EndTime time.Time
+	ServerIp string
+	ServerNetblock string
+	ServerAsn string
+	ServerAsName string
+	ServerAsFullName string
+	ServerAsClass string
+	Server_country string
+	ServerOrganization string
+	Source string
+	SeceivedError string
+	SeceivedStatus string
+	ReceivedHeaders string
+	ReceivedBody string
+	ReceivedTlsVersion string
 	ReceviedTlsCipherSuite string
 	ReceivedTlsCert string
 	ReceivedTlsCertCommonName string
 	ReceivedTlsCertAlternativeNames string
 	ReceivedTlsCertIssuer string
-	matchesTemplate bool
-	noResponseInMeasurementMatchesTemplate bool
-	controlsFailed bool
-	statefulBlock bool
+	MatchesTemplate bool
+	NoResponseInMeasurementMatchesTemplate bool
+	ControlsFailed bool
+	StatefulBlock bool
 
 }

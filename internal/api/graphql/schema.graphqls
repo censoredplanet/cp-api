@@ -15,7 +15,7 @@ type Hyperquack {
   serverAsName: String
   serverAsFullName: String
   serverAsClass: String
-  server_country: String
+  serverCountry: String
   serverOrganization: String
   source: String
   receivedError: String
@@ -23,11 +23,11 @@ type Hyperquack {
   receivedHeaders: String
   receivedBody: String
   receivedTlsVersion: String
-  ReceviedTlsCipherSuite: String
-  ReceivedTlsCert: String
-  ReceivedTlsCertCommonName: String
-  ReceivedTlsCertAlternativeNames: String
-  ReceivedTlsCertIssuer: String
+  receviedTlsCipherSuite: String
+  receivedTlsCert: String
+  receivedTlsCertCommonName: String
+  receivedTlsCertAlternativeNames: String
+  receivedTlsCertIssuer: String
   matchesTemplate: Boolean
   noResponseInMeasurementMatchesTemplate: Boolean
   controlsFailed: Boolean
@@ -80,6 +80,10 @@ input FilterSatellite {
 
 # Defines the endpoints to fetch data from 
 type Query {
-  hyperquackMeasurements(filter: Filter!): Hyperquack!
+  hyperquackMeasurements(filter: FilterHyperquack!): Hyperquack!
+}
+
+type Query {
+  satelliteMeasurements(filter: FilterSatellite!): Satellite!
 }
 
