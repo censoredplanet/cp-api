@@ -13,9 +13,7 @@ RUN addgroup -g 1001 -S appgroup && adduser -u 1001 -S appuser -G appgroup
 
 WORKDIR /app
 COPY --from=builder /app/cp-api .
-COPY --from=builder /app/.env .
 RUN chown -R appuser:appgroup /app
 
 USER appuser
-EXPOSE 8080
 ENTRYPOINT ["/app/cp-api"]
