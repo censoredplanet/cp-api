@@ -6,18 +6,147 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	graph "github.com/censoredplanet/cp-api/internal/api/graphql/generated"
+	"github.com/censoredplanet/cp-api/internal/api/graphql/generated"
 	"github.com/censoredplanet/cp-api/internal/api/graphql/model"
+	"github.com/censoredplanet/cp-api/internal/entities"
+	"github.com/censoredplanet/cp-api/internal/scalar"
 )
 
-// HyperquackMeasurements is the resolver for the hyperquackMeasurements field.
-func (r *queryResolver) HyperquackMeasurements(ctx context.Context, filter model.Filter) (model.Hyperquack, error) {
-	panic(fmt.Errorf("not implemented: HyperquackMeasurements - hyperquackMeasurements"))
+// Retry is the resolver for the retry field.
+func (r *hyperquackResolver) Retry(ctx context.Context, obj *entities.Hyperquack) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.Retry), nil
 }
 
-// Query returns graph.QueryResolver implementation.
-func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
+// ServerAsn is the resolver for the serverAsn field.
+func (r *hyperquackResolver) ServerAsn(ctx context.Context, obj *entities.Hyperquack) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.ServerAsn), nil
+}
 
+// ReceivedTLSVersion is the resolver for the receivedTlsVersion field.
+func (r *hyperquackResolver) ReceivedTLSVersion(ctx context.Context, obj *entities.Hyperquack) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.ReceivedTlsVersion), nil
+}
+
+// ReceivedTLSCipherSuite is the resolver for the receivedTlsCipherSuite field.
+func (r *hyperquackResolver) ReceivedTLSCipherSuite(ctx context.Context, obj *entities.Hyperquack) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.ReceivedTlsCipherSuite), nil
+}
+
+// Hyperquack is the resolver for the hyperquack field.
+func (r *queryResolver) Hyperquack(ctx context.Context, filter model.FilterHyperquack) ([]*entities.Hyperquack, error) {
+	return r.Service.Hyperquack(ctx, filter)
+}
+
+// Satellite is the resolver for the satellite field.
+func (r *queryResolver) Satellite(ctx context.Context, filter model.FilterSatellite) ([]*entities.Satellite, error) {
+	return r.Service.Satellite(ctx, filter)
+}
+
+// Dashboard is the resolver for the dashboard field.
+func (r *queryResolver) Dashboard(ctx context.Context, filter model.FilterDashboard) ([]*entities.Dashboard, error) {
+	return r.Service.Dashboard(ctx, filter)
+}
+
+// TotalMeasurementsCount is the resolver for the totalMeasurementsCount field.
+func (r *queryResolver) TotalMeasurementsCount(ctx context.Context) (string, error) {
+	return r.Service.TotalMeasurementsCount(ctx)
+}
+
+// MeasurementsCountByDate is the resolver for the measurementsCountByDate field.
+func (r *queryResolver) MeasurementsCountByDate(ctx context.Context, rangeArg model.DateRange) (string, error) {
+	return r.Service.MeasurementsCountByDate(ctx, rangeArg)
+}
+
+// InterferenceRateByCountry is the resolver for the interferenceRateByCountry field.
+func (r *queryResolver) InterferenceRateByCountry(ctx context.Context, rangeArg model.DateRange) ([]*entities.InterferenceRateByCountry, error) {
+	return r.Service.InterferenceRateByCountry(ctx, rangeArg)
+}
+
+// Domains is the resolver for the domains field.
+func (r *queryResolver) Domains(ctx context.Context, rangeArg model.DateRange, protocol string) ([]string, error) {
+	return r.Service.Domains(ctx, rangeArg, protocol)
+}
+
+// Countries is the resolver for the countries field.
+func (r *queryResolver) Countries(ctx context.Context, rangeArg model.DateRange, protocol string) ([]string, error) {
+	return r.Service.Countries(ctx, rangeArg, protocol)
+}
+
+// Retry is the resolver for the retry field.
+func (r *satelliteResolver) Retry(ctx context.Context, obj *entities.Satellite) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.Retry), nil
+}
+
+// ResolverAsn is the resolver for the resolverAsn field.
+func (r *satelliteResolver) ResolverAsn(ctx context.Context, obj *entities.Satellite) (*int, error) {
+	return scalar.ConvertUintPtrToIntPtr(obj.ResolverAsn), nil
+}
+
+// ResolverNonZeroRcodeRate is the resolver for the resolverNonZeroRcodeRate field.
+func (r *satelliteResolver) ResolverNonZeroRcodeRate(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.ResolverNonZeroRcodeRate), nil
+}
+
+// ResolverPrivateIPRate is the resolver for the resolverPrivateIpRate field.
+func (r *satelliteResolver) ResolverPrivateIPRate(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.ResolverPrivateIpRate), nil
+}
+
+// ResolverZeroIPRate is the resolver for the resolverZeroIpRate field.
+func (r *satelliteResolver) ResolverZeroIPRate(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.ResolverZeroIpRate), nil
+}
+
+// ResolverConnectErrorRate is the resolver for the resolverConnectErrorRate field.
+func (r *satelliteResolver) ResolverConnectErrorRate(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.ResolverConnectErrorRate), nil
+}
+
+// ResolverInvalidCertRate is the resolver for the resolverInvalidCertRate field.
+func (r *satelliteResolver) ResolverInvalidCertRate(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.ResolverInvalidCertRate), nil
+}
+
+// ReceivedRcode is the resolver for the receivedRcode field.
+func (r *satelliteResolver) ReceivedRcode(ctx context.Context, obj *entities.Satellite) (*int, error) {
+	return scalar.ConvertInt8PtrToIntPtr(obj.ReceivedRcode), nil
+}
+
+// AnswersAsn is the resolver for the answersAsn field.
+func (r *satelliteResolver) AnswersAsn(ctx context.Context, obj *entities.Satellite) ([]*int, error) {
+	return scalar.ConvertUint32PtrSliceToIntPtrSlice(obj.AnswersAsn), nil
+}
+
+// AnswersMatchConfidence is the resolver for the answersMatchConfidence field.
+func (r *satelliteResolver) AnswersMatchConfidence(ctx context.Context, obj *entities.Satellite) ([]*float64, error) {
+	return scalar.ConvertFloat32PtrSliceToFloat64PtrSlice(obj.AnswersMatchConfidence), nil
+}
+
+// AnswersHTTPSTLSVersion is the resolver for the answersHttpsTlsVersion field.
+func (r *satelliteResolver) AnswersHTTPSTLSVersion(ctx context.Context, obj *entities.Satellite) ([]*int, error) {
+	return scalar.ConvertUint16PtrSliceToIntPtrSlice(obj.AnswersHttpsTlsVersion), nil
+}
+
+// AnswersHTTPSTLSCipherSuite is the resolver for the answersHttpsTlsCipherSuite field.
+func (r *satelliteResolver) AnswersHTTPSTLSCipherSuite(ctx context.Context, obj *entities.Satellite) ([]*int, error) {
+	return scalar.ConvertUint16PtrSliceToIntPtrSlice(obj.AnswersHttpsTlsCipherSuite), nil
+}
+
+// AverageConfidence is the resolver for the averageConfidence field.
+func (r *satelliteResolver) AverageConfidence(ctx context.Context, obj *entities.Satellite) (*float64, error) {
+	return scalar.ConvertFloat32PtrToFloat64Ptr(obj.AverageConfidence), nil
+}
+
+// Hyperquack returns generated.HyperquackResolver implementation.
+func (r *Resolver) Hyperquack() generated.HyperquackResolver { return &hyperquackResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+// Satellite returns generated.SatelliteResolver implementation.
+func (r *Resolver) Satellite() generated.SatelliteResolver { return &satelliteResolver{r} }
+
+type hyperquackResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type satelliteResolver struct{ *Resolver }

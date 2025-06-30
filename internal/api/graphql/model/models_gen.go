@@ -2,23 +2,36 @@
 
 package model
 
-type Filter struct {
-	Protocol  string `json:"protocol"`
-	Domain    string `json:"domain"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
+import (
+	"time"
+)
+
+type DateRange struct {
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 }
 
-type Hyperquack struct {
-	Protocol        string  `json:"protocol"`
-	Domain          string  `json:"domain"`
-	DomainIsControl *bool   `json:"domainIsControl,omitempty"`
-	Date            string  `json:"date"`
-	StartTime       string  `json:"startTime"`
-	EndTime         string  `json:"endTime"`
-	ServerIP        *string `json:"serverIp,omitempty"`
-	ServerNetblock  *string `json:"serverNetblock,omitempty"`
-	ServerCountry   string  `json:"server_country"`
+type FilterDashboard struct {
+	Domains   []string  `json:"domains"`
+	Country   string    `json:"country"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+	Source    string    `json:"source"`
+}
+
+type FilterHyperquack struct {
+	Protocol  string    `json:"protocol"`
+	Domain    string    `json:"domain"`
+	Country   string    `json:"country"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+}
+
+type FilterSatellite struct {
+	Domain    string    `json:"domain"`
+	Country   string    `json:"country"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 }
 
 type Query struct {

@@ -26,7 +26,7 @@ resolver:
   # omit_template_comment: false
 
 # Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
-# struct_tag: json
+struct_tag: json
 
 # Optional: turn on to use []Thing instead of []*Thing
 # omit_slice_element_pointers: false
@@ -65,7 +65,7 @@ resolvers_always_return_pointers: false
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "github.com/censoredplanet/cp-api/internal/api/graph/model"
+  - "github.com/censoredplanet/cp-api/internal/entities"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -84,3 +84,49 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+
+  DateTime:
+    model:
+      - github.com/99designs/gqlgen/graphql.Time
+
+  Date:
+    model:
+      - github.com/censoredplanet/cp-api/internal/scalar.Date
+
+  Hyperquack:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.Hyperquack
+    fields:
+      retry:
+        resolver: true
+      receivedTlsVersion:
+        resolver: true
+      receivedTlsCipherSuite:
+        resolver: true
+      serverAsn:
+        resolver: true
+
+  Satellite:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.Satellite
+    fields:
+      retry:
+        resolver: true
+      resolverAsn:
+        resolver: true
+      receivedRcode:
+        resolver: true
+      answersAsn:
+        resolver: true
+      answersHttpsTlsVersion:
+        resolver: true
+      answersHttpsTlsCipherSuite:
+        resolver: true
+  
+  Dashboard:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.Dashboard
+
+  InterferenceRateByCountry:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.InterferenceRateByCountry
