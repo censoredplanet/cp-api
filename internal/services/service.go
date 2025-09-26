@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/censoredplanet/cp-api/internal/api/graphql/model"
@@ -21,6 +23,36 @@ type ServicePort interface {
 	InterferenceRateByCountry(ctx context.Context, filter model.DateRange) ([]*entities.InterferenceRateByCountry, error)
 	Domains(ctx context.Context, filter model.DateRange, protocol string) ([]string, error)
 	Countries(ctx context.Context, filter model.DateRange, protocol string) ([]string, error)
+	CenAlertTimeSeries(ctx context.Context, filter *model.DateRange, country string) ([]*entities.CenAlertTimeSeries, error)
+	CenAlertCountries(ctx context.Context) ([]string, error)
+	CenAlertEvents(ctx context.Context, filter *model.DateRange, country *string) ([]*entities.CenAlertEvents, error)
+}
+
+var errGeneric = errors.New("something went wrong :(")
+
+var (
+	minCenAlertDate = time.Date(2011, 1, 1, 0, 0, 0, 0, time.UTC)
+)
+
+func clampDateRange(r *model.DateRange) *model.DateRange {
+	maxCenAlertDate := time.Now().UTC().Truncate(24 * time.Hour)
+	if r == nil {
+		return &model.DateRange{StartDate: minCenAlertDate, EndDate: maxCenAlertDate}
+	}
+	start := r.StartDate.UTC()
+	end := r.EndDate.UTC()
+
+	if start.Before(minCenAlertDate) {
+		start = minCenAlertDate
+	}
+	if end.After(maxCenAlertDate) {
+		end = maxCenAlertDate
+	}
+	if end.Before(start) {
+		end = start
+	}
+
+	return &model.DateRange{StartDate: start, EndDate: end}
 }
 
 type ServiceRepository struct {
@@ -54,7 +86,7 @@ func (s ServiceRepository) Hyperquack(ctx context.Context, filter model.FilterHy
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
 		if chCol, ok := database.GQLToCHHyperquack[f]; ok {
-			if strings.HasPrefix(chCol, "received_tls") && strings.ToUpper(strings.TrimSpace(filter.Protocol)) != "HTTPS" {
+			if strings.HasPrefix(chCol, "received_tls") && strings.ToLower(strings.TrimSpace(filter.Protocol)) != "https" {
 				continue
 			}
 			cols = append(cols, chCol)
@@ -62,10 +94,11 @@ func (s ServiceRepository) Hyperquack(ctx context.Context, filter model.FilterHy
 	}
 	columns := strings.Join(cols, ", ")
 
-	switch strings.ToUpper(strings.TrimSpace(filter.Protocol)) {
-	case "HTTPS", "HTTP", "ECHO", "DISCARD":
+	proto := strings.ToLower(strings.TrimSpace(filter.Protocol))
+	switch proto {
+	case "https", "http", "echo", "discard":
 		res, err := s.clickHouseRepository.Hyperquack(ctx, entities.HyperquackFilterCH{
-			Protocol:  filter.Protocol,
+			Protocol:  proto,
 			Domain:    filter.Domain,
 			Country:   filter.Country,
 			StartDate: filter.StartDate.Format("2006-01-02"),
@@ -74,7 +107,7 @@ func (s ServiceRepository) Hyperquack(ctx context.Context, filter model.FilterHy
 
 		if err != nil {
 			s.slack.Error("service.go", "Hyperquack", "clickHouseRepository.Hyperquack", err.Error())
-			return nil, fmt.Errorf("something went wrong :(")
+			return nil, errGeneric
 		}
 		return res, nil
 	default:
@@ -114,7 +147,7 @@ func (s ServiceRepository) Satellite(ctx context.Context, filter model.FilterSat
 	}, columns, fromMonth, toMonth)
 	if err != nil {
 		s.slack.Error("service.go", "Satellite", "clickHouseRepository.Satellite", err.Error())
-		return nil, fmt.Errorf("something went wrong :(")
+		return nil, errGeneric
 	}
 	return res, nil
 }
@@ -144,10 +177,11 @@ func (s ServiceRepository) Dashboard(ctx context.Context, filter model.FilterDas
 	}
 	columns := strings.Join(cols, ", ")
 
-	switch strings.ToUpper(strings.TrimSpace(filter.Source)) {
+	proto := strings.ToUpper(strings.TrimSpace(filter.Source))
+	switch proto {
 	case "HTTPS", "HTTP", "ECHO", "DISCARD", "DNS":
 		res, err := s.clickHouseRepository.DashBoard(ctx, entities.DashboardFilterCH{
-			Source:    filter.Source,
+			Source:    proto,
 			Domains:   filter.Domains,
 			Country:   filter.Country,
 			StartDate: filter.StartDate.Format("2006-01-02"),
@@ -156,7 +190,7 @@ func (s ServiceRepository) Dashboard(ctx context.Context, filter model.FilterDas
 
 		if err != nil {
 			s.slack.Error("service.go", "Dashboard", "clickHouseRepository.DashBoard", err.Error())
-			return nil, fmt.Errorf("something went wrong :(")
+			return nil, errGeneric
 		}
 		return res, nil
 	default:
@@ -168,7 +202,7 @@ func (s ServiceRepository) TotalMeasurementsCount(ctx context.Context) (string, 
 	res, err := s.clickHouseRepository.TotalMeasurementsCount(ctx)
 	if err != nil {
 		s.slack.Error("service.go", "TotalMeasurementsCount", "clickHouseRepository.TotalMeasurementsCount", err.Error())
-		return "", fmt.Errorf("something went wrong :(")
+		return "", errGeneric
 	}
 	return res, nil
 }
@@ -181,7 +215,7 @@ func (s ServiceRepository) MeasurementsCountByDate(ctx context.Context, filter m
 	res, err := s.clickHouseRepository.MeasurementsCountByDate(ctx, filter.StartDate, filter.EndDate)
 	if err != nil {
 		s.slack.Error("service.go", "MeasurementsCountByDate", "clickHouseRepository.MeasurementsCountByDate", err.Error())
-		return "", fmt.Errorf("something went wrong :(")
+		return "", errGeneric
 	}
 	return res, nil
 }
@@ -194,7 +228,7 @@ func (s ServiceRepository) InterferenceRateByCountry(ctx context.Context, filter
 	res, err := s.clickHouseRepository.InterferenceRateByCountry(ctx, filter.StartDate, filter.EndDate)
 	if err != nil {
 		s.slack.Error("service.go", "MeasurementsCountByDate", "clickHouseRepository.MeasurementsCountByDate", err.Error())
-		return nil, fmt.Errorf("something went wrong :(")
+		return nil, errGeneric
 	}
 	return res, nil
 }
@@ -203,12 +237,13 @@ func (s ServiceRepository) Domains(ctx context.Context, filter model.DateRange, 
 	if filter.EndDate.Before(filter.StartDate) {
 		return nil, fmt.Errorf("end date cannot be earlier than start date")
 	}
-	switch strings.ToUpper(strings.TrimSpace(protocol)) {
-	case "DNS", "HTTPS", "HTTP", "ECHO", "DISCARD":
-		res, err := s.clickHouseRepository.Domains(ctx, filter.StartDate, filter.EndDate, strings.ToLower(protocol))
+	proto := strings.ToLower(strings.TrimSpace(protocol))
+	switch proto {
+	case "dns", "https", "http", "echo", "discard":
+		res, err := s.clickHouseRepository.Domains(ctx, filter.StartDate, filter.EndDate, proto)
 		if err != nil {
 			s.slack.Error("service.go", "Domains", "clickHouseRepository.Domains", err.Error())
-			return nil, fmt.Errorf("something went wrong :(")
+			return nil, errGeneric
 		}
 		return res, nil
 	default:
@@ -220,15 +255,77 @@ func (s ServiceRepository) Countries(ctx context.Context, filter model.DateRange
 	if filter.EndDate.Before(filter.StartDate) {
 		return nil, fmt.Errorf("end date cannot be earlier than start date")
 	}
-	switch strings.ToUpper(strings.TrimSpace(protocol)) {
-	case "DNS", "HTTPS", "HTTP", "ECHO", "DISCARD":
-		res, err := s.clickHouseRepository.Countries(ctx, filter.StartDate, filter.EndDate, strings.ToLower(protocol))
+	proto := strings.ToLower(strings.TrimSpace(protocol))
+	switch proto {
+	case "dns", "https", "http", "echo", "discard":
+		res, err := s.clickHouseRepository.Countries(ctx, filter.StartDate, filter.EndDate, proto)
 		if err != nil {
 			s.slack.Error("service.go", "Countries", "clickHouseRepository.Countries", err.Error())
-			return nil, fmt.Errorf("something went wrong :(")
+			return nil, errGeneric
 		}
 		return res, nil
 	default:
 		return nil, fmt.Errorf("invalid protocol: %q, must be one of: DNS, HTTPS, HTTP, ECHO, DISCARD", protocol)
 	}
+}
+
+func (s ServiceRepository) CenAlertTimeSeries(ctx context.Context, filter *model.DateRange, country string) ([]*entities.CenAlertTimeSeries, error) {
+	if filter != nil && filter.EndDate.Before(filter.StartDate) {
+		return nil, fmt.Errorf("end date cannot be earlier than start date")
+	}
+	if len(country) != 2 {
+		return nil, fmt.Errorf("country must be a 2-character ISO country code")
+	}
+	filter = clampDateRange(filter)
+
+	requested := graphql.CollectAllFields(ctx)
+	cols := make([]string, 0, len(requested))
+	for _, f := range requested {
+		if chCol, ok := database.GQLToCHCenAlert[f]; ok {
+			cols = append(cols, chCol)
+		}
+	}
+	columns := strings.Join(cols, ", ")
+
+	res, err := s.clickHouseRepository.CenAlertTimeSeries(ctx, columns, filter.StartDate.Format("2006-01-02"), filter.EndDate.Format("2006-01-02"), country)
+	if err != nil {
+		s.slack.Error("service.go", "CenAlertTimeSeries", "clickHouseRepository.CenAlertTimeSeries", err.Error())
+		return nil, errGeneric
+	}
+	return res, nil
+}
+
+func (s ServiceRepository) CenAlertCountries(ctx context.Context) ([]string, error) {
+	res, err := s.clickHouseRepository.CenAlertCountries(ctx)
+	if err != nil {
+		s.slack.Error("service.go", "CenAlertCountries", "clickHouseRepository.CenAlertCountries", err.Error())
+		return nil, errGeneric
+	}
+	return res, nil
+}
+
+func (s ServiceRepository) CenAlertEvents(ctx context.Context, filter *model.DateRange, country *string) ([]*entities.CenAlertEvents, error) {
+	if filter != nil && filter.EndDate.Before(filter.StartDate) {
+		return nil, fmt.Errorf("end date cannot be earlier than start date")
+	}
+	if country != nil && len(*country) != 2 {
+		return nil, fmt.Errorf("country must be a 2-character ISO country code")
+	}
+	filter = clampDateRange(filter)
+
+	requested := graphql.CollectAllFields(ctx)
+	cols := make([]string, 0, len(requested))
+	for _, f := range requested {
+		if chCol, ok := database.GQLToCHCenAlertEvents[f]; ok {
+			cols = append(cols, chCol)
+		}
+	}
+	columns := strings.Join(cols, ", ")
+
+	res, err := s.clickHouseRepository.CenAlertEvents(ctx, columns, filter.StartDate.Format("2006-01-02"), filter.EndDate.Format("2006-01-02"), country)
+	if err != nil {
+		s.slack.Error("service.go", "CenAlertEvents", "clickHouseRepository.CenAlertEvents", err.Error())
+		return nil, errGeneric
+	}
+	return res, nil
 }

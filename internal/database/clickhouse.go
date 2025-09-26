@@ -117,7 +117,7 @@ func (ch clickHouseRepository) DashBoard(ctx context.Context, filter entities.Da
 		inClause,
 	)
 
-	params := make([]interface{}, 0, len(filter.Domains)+5)
+	params := make([]any, 0, len(filter.Domains)+5)
 	params = append(params, filter.Country)
 
 	for _, domain := range filter.Domains {
@@ -257,6 +257,95 @@ func (ch clickHouseRepository) Countries(ctx context.Context, startDate time.Tim
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating over countries rows: %w", err)
+	}
+
+	return results, nil
+}
+
+func (ch clickHouseRepository) CenAlertTimeSeries(ctx context.Context, columns string, startDate, endDate string, country string) ([]*entities.CenAlertTimeSeries, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM cenalert.series WHERE country = ? AND date BETWEEN ? AND ?",
+		columns,
+	)
+
+	params := []any{country, startDate, endDate}
+
+	rows, err := (*ch.client).Query(ctx, query, params...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []*entities.CenAlertTimeSeries
+
+	for rows.Next() {
+		var res entities.CenAlertTimeSeries
+		if err := rows.ScanStruct(&res); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		results = append(results, &res)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %w", err)
+	}
+
+	return results, nil
+}
+
+func (ch clickHouseRepository) CenAlertCountries(ctx context.Context) ([]string, error) {
+	query := "SELECT DISTINCT country FROM cenalert.series ORDER BY country"
+	rows, err := (*ch.client).Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute countries query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []string
+	for rows.Next() {
+		var country string
+		if err := rows.Scan(&country); err != nil {
+			return nil, fmt.Errorf("failed to scan domains row: %w", err)
+		}
+		results = append(results, country)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over countries rows: %w", err)
+	}
+
+	return results, nil
+}
+
+func (ch clickHouseRepository) CenAlertEvents(ctx context.Context, columns string, startDate, endDate string, country *string) ([]*entities.CenAlertEvents, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM cenalert.events WHERE start BETWEEN ? AND ?",
+		columns,
+	)
+	params := []any{startDate, endDate}
+
+	if country != nil {
+		query += " AND country = ?"
+		params = append(params, *country)
+	}
+
+	rows, err := (*ch.client).Query(ctx, query, params...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []*entities.CenAlertEvents
+
+	for rows.Next() {
+		var res entities.CenAlertEvents
+		if err := rows.ScanStruct(&res); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		results = append(results, &res)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %w", err)
 	}
 
 	return results, nil

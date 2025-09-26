@@ -130,3 +130,11 @@ models:
   InterferenceRateByCountry:
     model:
       - github.com/censoredplanet/cp-api/internal/entities.InterferenceRateByCountry
+
+  CenAlertTimeSeries:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.CenAlertTimeSeries
+
+  CenAlertEvents:
+    model:
+      - github.com/censoredplanet/cp-api/internal/entities.CenAlertEvents

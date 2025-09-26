@@ -6,9 +6,12 @@ import (
 	"time"
 )
 
+// Inclusive date range. Dates must be in YYYY-MM-DD.
 type DateRange struct {
+	// Start date (YYYY-MM-DD).
 	StartDate time.Time `json:"startDate"`
-	EndDate   time.Time `json:"endDate"`
+	// End date (YYYY-MM-DD).
+	EndDate time.Time `json:"endDate"`
 }
 
 type FilterDashboard struct {

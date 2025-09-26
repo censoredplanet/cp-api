@@ -50,6 +50,22 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	CenAlertEvents struct {
+		Cause      func(childComplexity int) int
+		Country    func(childComplexity int) int
+		EndDate    func(childComplexity int) int
+		Impact     func(childComplexity int) int
+		Peak       func(childComplexity int) int
+		ReportedBy func(childComplexity int) int
+		StartDate  func(childComplexity int) int
+	}
+
+	CenAlertTimeSeries struct {
+		Country func(childComplexity int) int
+		Date    func(childComplexity int) int
+		Value   func(childComplexity int) int
+	}
+
 	Dashboard struct {
 		Category        func(childComplexity int) int
 		Count           func(childComplexity int) int
@@ -109,6 +125,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		CenalertCountries         func(childComplexity int) int
+		CenalertEvents            func(childComplexity int, rangeArg *model.DateRange, country *string) int
+		CenalertTimeseries        func(childComplexity int, rangeArg *model.DateRange, country string) int
 		Countries                 func(childComplexity int, rangeArg model.DateRange, protocol string) int
 		Dashboard                 func(childComplexity int, filter model.FilterDashboard) int
 		Domains                   func(childComplexity int, rangeArg model.DateRange, protocol string) int
@@ -205,6 +224,9 @@ type QueryResolver interface {
 	InterferenceRateByCountry(ctx context.Context, rangeArg model.DateRange) ([]*entities.InterferenceRateByCountry, error)
 	Domains(ctx context.Context, rangeArg model.DateRange, protocol string) ([]string, error)
 	Countries(ctx context.Context, rangeArg model.DateRange, protocol string) ([]string, error)
+	CenalertTimeseries(ctx context.Context, rangeArg *model.DateRange, country string) ([]*entities.CenAlertTimeSeries, error)
+	CenalertCountries(ctx context.Context) ([]string, error)
+	CenalertEvents(ctx context.Context, rangeArg *model.DateRange, country *string) ([]*entities.CenAlertEvents, error)
 }
 type SatelliteResolver interface {
 	Retry(ctx context.Context, obj *entities.Satellite) (*int, error)
@@ -243,10 +265,72 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
+func (e *executableSchema) Complexity(ctx context.Context, typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "CenAlertEvents.cause":
+		if e.complexity.CenAlertEvents.Cause == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.Cause(childComplexity), true
+	case "CenAlertEvents.country":
+		if e.complexity.CenAlertEvents.Country == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.Country(childComplexity), true
+	case "CenAlertEvents.endDate":
+		if e.complexity.CenAlertEvents.EndDate == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.EndDate(childComplexity), true
+	case "CenAlertEvents.impact":
+		if e.complexity.CenAlertEvents.Impact == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.Impact(childComplexity), true
+	case "CenAlertEvents.peak":
+		if e.complexity.CenAlertEvents.Peak == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.Peak(childComplexity), true
+	case "CenAlertEvents.reportedBy":
+		if e.complexity.CenAlertEvents.ReportedBy == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.ReportedBy(childComplexity), true
+	case "CenAlertEvents.startDate":
+		if e.complexity.CenAlertEvents.StartDate == nil {
+			break
+		}
+
+		return e.complexity.CenAlertEvents.StartDate(childComplexity), true
+
+	case "CenAlertTimeSeries.country":
+		if e.complexity.CenAlertTimeSeries.Country == nil {
+			break
+		}
+
+		return e.complexity.CenAlertTimeSeries.Country(childComplexity), true
+	case "CenAlertTimeSeries.date":
+		if e.complexity.CenAlertTimeSeries.Date == nil {
+			break
+		}
+
+		return e.complexity.CenAlertTimeSeries.Date(childComplexity), true
+	case "CenAlertTimeSeries.value":
+		if e.complexity.CenAlertTimeSeries.Value == nil {
+			break
+		}
+
+		return e.complexity.CenAlertTimeSeries.Value(childComplexity), true
 
 	case "Dashboard.category":
 		if e.complexity.Dashboard.Category == nil {
@@ -254,77 +338,66 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Dashboard.Category(childComplexity), true
-
 	case "Dashboard.count":
 		if e.complexity.Dashboard.Count == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Count(childComplexity), true
-
 	case "Dashboard.country":
 		if e.complexity.Dashboard.Country == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Country(childComplexity), true
-
 	case "Dashboard.date":
 		if e.complexity.Dashboard.Date == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Date(childComplexity), true
-
 	case "Dashboard.domain":
 		if e.complexity.Dashboard.Domain == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Domain(childComplexity), true
-
 	case "Dashboard.hostName":
 		if e.complexity.Dashboard.HostName == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.HostName(childComplexity), true
-
 	case "Dashboard.network":
 		if e.complexity.Dashboard.Network == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Network(childComplexity), true
-
 	case "Dashboard.outcome":
 		if e.complexity.Dashboard.Outcome == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Outcome(childComplexity), true
-
 	case "Dashboard.regHostName":
 		if e.complexity.Dashboard.RegHostName == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.RegHostName(childComplexity), true
-
 	case "Dashboard.source":
 		if e.complexity.Dashboard.Source == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.Source(childComplexity), true
-
 	case "Dashboard.subNetwork":
 		if e.complexity.Dashboard.SubNetwork == nil {
 			break
 		}
 
 		return e.complexity.Dashboard.SubNetwork(childComplexity), true
-
 	case "Dashboard.unexpectedCount":
 		if e.complexity.Dashboard.UnexpectedCount == nil {
 			break
@@ -338,238 +411,204 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Hyperquack.ControlsFailed(childComplexity), true
-
 	case "Hyperquack.date":
 		if e.complexity.Hyperquack.Date == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.Date(childComplexity), true
-
 	case "Hyperquack.domain":
 		if e.complexity.Hyperquack.Domain == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.Domain(childComplexity), true
-
 	case "Hyperquack.domainCategory":
 		if e.complexity.Hyperquack.DomainCategory == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.DomainCategory(childComplexity), true
-
 	case "Hyperquack.domainIsControl":
 		if e.complexity.Hyperquack.DomainIsControl == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.DomainIsControl(childComplexity), true
-
 	case "Hyperquack.endTime":
 		if e.complexity.Hyperquack.EndTime == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.EndTime(childComplexity), true
-
 	case "Hyperquack.isKnownBlockpage":
 		if e.complexity.Hyperquack.IsKnownBlockpage == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.IsKnownBlockpage(childComplexity), true
-
 	case "Hyperquack.matchesTemplate":
 		if e.complexity.Hyperquack.MatchesTemplate == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.MatchesTemplate(childComplexity), true
-
 	case "Hyperquack.measurementId":
 		if e.complexity.Hyperquack.MeasurementId == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.MeasurementId(childComplexity), true
-
 	case "Hyperquack.noResponseInMeasurementMatchesTemplate":
 		if e.complexity.Hyperquack.NoResponseInMeasurementMatchesTemplate == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.NoResponseInMeasurementMatchesTemplate(childComplexity), true
-
 	case "Hyperquack.outcome":
 		if e.complexity.Hyperquack.Outcome == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.Outcome(childComplexity), true
-
 	case "Hyperquack.pageSignature":
 		if e.complexity.Hyperquack.PageSignature == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.PageSignature(childComplexity), true
-
 	case "Hyperquack.receivedBody":
 		if e.complexity.Hyperquack.ReceivedBody == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedBody(childComplexity), true
-
 	case "Hyperquack.receivedError":
 		if e.complexity.Hyperquack.ReceivedError == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedError(childComplexity), true
-
 	case "Hyperquack.receivedHeaders":
 		if e.complexity.Hyperquack.ReceivedHeaders == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedHeaders(childComplexity), true
-
 	case "Hyperquack.receivedStatus":
 		if e.complexity.Hyperquack.ReceivedStatus == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedStatus(childComplexity), true
-
 	case "Hyperquack.receivedTlsCipherSuite":
 		if e.complexity.Hyperquack.ReceivedTLSCipherSuite == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTLSCipherSuite(childComplexity), true
-
 	case "Hyperquack.receivedTlsVersion":
 		if e.complexity.Hyperquack.ReceivedTLSVersion == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTLSVersion(childComplexity), true
-
 	case "Hyperquack.receivedTlsCert":
 		if e.complexity.Hyperquack.ReceivedTlsCert == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTlsCert(childComplexity), true
-
 	case "Hyperquack.receivedTlsCertAlternativeNames":
 		if e.complexity.Hyperquack.ReceivedTlsCertAlternativeNames == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTlsCertAlternativeNames(childComplexity), true
-
 	case "Hyperquack.receivedTlsCertCommonName":
 		if e.complexity.Hyperquack.ReceivedTlsCertCommonName == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTlsCertCommonName(childComplexity), true
-
 	case "Hyperquack.receivedTlsCertIssuer":
 		if e.complexity.Hyperquack.ReceivedTlsCertIssuer == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTlsCertIssuer(childComplexity), true
-
 	case "Hyperquack.receivedTlsCertMatchesDomain":
 		if e.complexity.Hyperquack.ReceivedTlsCertMatchesDomain == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ReceivedTlsCertMatchesDomain(childComplexity), true
-
 	case "Hyperquack.retry":
 		if e.complexity.Hyperquack.Retry == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.Retry(childComplexity), true
-
 	case "Hyperquack.serverAsClass":
 		if e.complexity.Hyperquack.ServerAsClass == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerAsClass(childComplexity), true
-
 	case "Hyperquack.serverAsFullName":
 		if e.complexity.Hyperquack.ServerAsFullName == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerAsFullName(childComplexity), true
-
 	case "Hyperquack.serverAsName":
 		if e.complexity.Hyperquack.ServerAsName == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerAsName(childComplexity), true
-
 	case "Hyperquack.serverAsn":
 		if e.complexity.Hyperquack.ServerAsn == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerAsn(childComplexity), true
-
 	case "Hyperquack.serverCountry":
 		if e.complexity.Hyperquack.ServerCountry == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerCountry(childComplexity), true
-
 	case "Hyperquack.serverIp":
 		if e.complexity.Hyperquack.ServerIp == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerIp(childComplexity), true
-
 	case "Hyperquack.serverNetblock":
 		if e.complexity.Hyperquack.ServerNetblock == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerNetblock(childComplexity), true
-
 	case "Hyperquack.serverOrganization":
 		if e.complexity.Hyperquack.ServerOrganization == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.ServerOrganization(childComplexity), true
-
 	case "Hyperquack.source":
 		if e.complexity.Hyperquack.Source == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.Source(childComplexity), true
-
 	case "Hyperquack.startTime":
 		if e.complexity.Hyperquack.StartTime == nil {
 			break
 		}
 
 		return e.complexity.Hyperquack.StartTime(childComplexity), true
-
 	case "Hyperquack.statefulBlock":
 		if e.complexity.Hyperquack.StatefulBlock == nil {
 			break
@@ -583,7 +622,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.InterferenceRateByCountry.Country(childComplexity), true
-
 	case "InterferenceRateByCountry.unexpectedRate":
 		if e.complexity.InterferenceRateByCountry.UnexpectedCount == nil {
 			break
@@ -591,90 +629,111 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.InterferenceRateByCountry.UnexpectedCount(childComplexity), true
 
+	case "Query.cenalertCountries":
+		if e.complexity.Query.CenalertCountries == nil {
+			break
+		}
+
+		return e.complexity.Query.CenalertCountries(childComplexity), true
+	case "Query.cenalertEvents":
+		if e.complexity.Query.CenalertEvents == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cenalertEvents_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CenalertEvents(childComplexity, args["range"].(*model.DateRange), args["country"].(*string)), true
+	case "Query.cenalertTimeseries":
+		if e.complexity.Query.CenalertTimeseries == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cenalertTimeseries_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CenalertTimeseries(childComplexity, args["range"].(*model.DateRange), args["country"].(string)), true
 	case "Query.countries":
 		if e.complexity.Query.Countries == nil {
 			break
 		}
 
-		args, err := ec.field_Query_countries_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_countries_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.Countries(childComplexity, args["range"].(model.DateRange), args["protocol"].(string)), true
-
 	case "Query.dashboard":
 		if e.complexity.Query.Dashboard == nil {
 			break
 		}
 
-		args, err := ec.field_Query_dashboard_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_dashboard_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.Dashboard(childComplexity, args["filter"].(model.FilterDashboard)), true
-
 	case "Query.domains":
 		if e.complexity.Query.Domains == nil {
 			break
 		}
 
-		args, err := ec.field_Query_domains_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_domains_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.Domains(childComplexity, args["range"].(model.DateRange), args["protocol"].(string)), true
-
 	case "Query.hyperquack":
 		if e.complexity.Query.Hyperquack == nil {
 			break
 		}
 
-		args, err := ec.field_Query_hyperquack_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_hyperquack_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.Hyperquack(childComplexity, args["filter"].(model.FilterHyperquack)), true
-
 	case "Query.interferenceRateByCountry":
 		if e.complexity.Query.InterferenceRateByCountry == nil {
 			break
 		}
 
-		args, err := ec.field_Query_interferenceRateByCountry_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_interferenceRateByCountry_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.InterferenceRateByCountry(childComplexity, args["range"].(model.DateRange)), true
-
 	case "Query.measurementsCountByDate":
 		if e.complexity.Query.MeasurementsCountByDate == nil {
 			break
 		}
 
-		args, err := ec.field_Query_measurementsCountByDate_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_measurementsCountByDate_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.MeasurementsCountByDate(childComplexity, args["range"].(model.DateRange)), true
-
 	case "Query.satellite":
 		if e.complexity.Query.Satellite == nil {
 			break
 		}
 
-		args, err := ec.field_Query_satellite_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_satellite_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
 		return e.complexity.Query.Satellite(childComplexity, args["filter"].(model.FilterSatellite)), true
-
 	case "Query.totalMeasurementsCount":
 		if e.complexity.Query.TotalMeasurementsCount == nil {
 			break
@@ -688,448 +747,384 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Satellite.Anomaly(childComplexity), true
-
 	case "Satellite.answersAsName":
 		if e.complexity.Satellite.AnswersAsName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersAsName(childComplexity), true
-
 	case "Satellite.answersAsn":
 		if e.complexity.Satellite.AnswersAsn == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersAsn(childComplexity), true
-
 	case "Satellite.answersCensysHttpBodyHash":
 		if e.complexity.Satellite.AnswersCensysHttpBodyHash == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersCensysHttpBodyHash(childComplexity), true
-
 	case "Satellite.answersCensysIpCert":
 		if e.complexity.Satellite.AnswersCensysIpCert == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersCensysIpCert(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCipherSuite":
 		if e.complexity.Satellite.AnswersHTTPSTLSCipherSuite == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHTTPSTLSCipherSuite(childComplexity), true
-
 	case "Satellite.answersHttpsTlsVersion":
 		if e.complexity.Satellite.AnswersHTTPSTLSVersion == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHTTPSTLSVersion(childComplexity), true
-
 	case "Satellite.answersHttpAnalysisIsKnownBlockpage":
 		if e.complexity.Satellite.AnswersHttpAnalysisIsKnownBlockpage == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpAnalysisIsKnownBlockpage(childComplexity), true
-
 	case "Satellite.answersHttpAnalysisPageSignature":
 		if e.complexity.Satellite.AnswersHttpAnalysisPageSignature == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpAnalysisPageSignature(childComplexity), true
-
 	case "Satellite.answersHttpError":
 		if e.complexity.Satellite.AnswersHttpError == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpError(childComplexity), true
-
 	case "Satellite.answersHttpResponseStatus":
 		if e.complexity.Satellite.AnswersHttpResponseStatus == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpResponseStatus(childComplexity), true
-
 	case "Satellite.answersHttpsAnalysisIsKnownBlockpage":
 		if e.complexity.Satellite.AnswersHttpsAnalysisIsKnownBlockpage == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsAnalysisIsKnownBlockpage(childComplexity), true
-
 	case "Satellite.answersHttpsAnalysisPageSignature":
 		if e.complexity.Satellite.AnswersHttpsAnalysisPageSignature == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsAnalysisPageSignature(childComplexity), true
-
 	case "Satellite.answersHttpsError":
 		if e.complexity.Satellite.AnswersHttpsError == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsError(childComplexity), true
-
 	case "Satellite.answersHttpsResponseStatus":
 		if e.complexity.Satellite.AnswersHttpsResponseStatus == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsResponseStatus(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCert":
 		if e.complexity.Satellite.AnswersHttpsTlsCert == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCert(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertAlternativeNames":
 		if e.complexity.Satellite.AnswersHttpsTlsCertAlternativeNames == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertAlternativeNames(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertCommonName":
 		if e.complexity.Satellite.AnswersHttpsTlsCertCommonName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertCommonName(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertEndDate":
 		if e.complexity.Satellite.AnswersHttpsTlsCertEndDate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertEndDate(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertHasTrustedCa":
 		if e.complexity.Satellite.AnswersHttpsTlsCertHasTrustedCa == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertHasTrustedCa(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertIssuer":
 		if e.complexity.Satellite.AnswersHttpsTlsCertIssuer == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertIssuer(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertMatchesDomain":
 		if e.complexity.Satellite.AnswersHttpsTlsCertMatchesDomain == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertMatchesDomain(childComplexity), true
-
 	case "Satellite.answersHttpsTlsCertStartDate":
 		if e.complexity.Satellite.AnswersHttpsTlsCertStartDate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersHttpsTlsCertStartDate(childComplexity), true
-
 	case "Satellite.answersIp":
 		if e.complexity.Satellite.AnswersIp == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersIp(childComplexity), true
-
 	case "Satellite.answersIpOrganization":
 		if e.complexity.Satellite.AnswersIpOrganization == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersIpOrganization(childComplexity), true
-
 	case "Satellite.answersMatchConfidence":
 		if e.complexity.Satellite.AnswersMatchConfidence == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchConfidence(childComplexity), true
-
 	case "Satellite.answersMatchesControlAsName":
 		if e.complexity.Satellite.AnswersMatchesControlAsName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchesControlAsName(childComplexity), true
-
 	case "Satellite.answersMatchesControlAsn":
 		if e.complexity.Satellite.AnswersMatchesControlAsn == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchesControlAsn(childComplexity), true
-
 	case "Satellite.answersMatchesControlCensysHttpBodyHash":
 		if e.complexity.Satellite.AnswersMatchesControlCensysHttpBodyHash == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchesControlCensysHttpBodyHash(childComplexity), true
-
 	case "Satellite.answersMatchesControlCensysIpCert":
 		if e.complexity.Satellite.AnswersMatchesControlCensysIpCert == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchesControlCensysIpCert(childComplexity), true
-
 	case "Satellite.answersMatchesControlIp":
 		if e.complexity.Satellite.AnswersMatchesControlIp == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AnswersMatchesControlIp(childComplexity), true
-
 	case "Satellite.averageConfidence":
 		if e.complexity.Satellite.AverageConfidence == nil {
 			break
 		}
 
 		return e.complexity.Satellite.AverageConfidence(childComplexity), true
-
 	case "Satellite.date":
 		if e.complexity.Satellite.Date == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Date(childComplexity), true
-
 	case "Satellite.domain":
 		if e.complexity.Satellite.Domain == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Domain(childComplexity), true
-
 	case "Satellite.domainCategory":
 		if e.complexity.Satellite.DomainCategory == nil {
 			break
 		}
 
 		return e.complexity.Satellite.DomainCategory(childComplexity), true
-
 	case "Satellite.domainControlsFailed":
 		if e.complexity.Satellite.DomainControlsFailed == nil {
 			break
 		}
 
 		return e.complexity.Satellite.DomainControlsFailed(childComplexity), true
-
 	case "Satellite.domainIsControl":
 		if e.complexity.Satellite.DomainIsControl == nil {
 			break
 		}
 
 		return e.complexity.Satellite.DomainIsControl(childComplexity), true
-
 	case "Satellite.endTime":
 		if e.complexity.Satellite.EndTime == nil {
 			break
 		}
 
 		return e.complexity.Satellite.EndTime(childComplexity), true
-
 	case "Satellite.excludeReason":
 		if e.complexity.Satellite.ExcludeReason == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ExcludeReason(childComplexity), true
-
 	case "Satellite.excluded":
 		if e.complexity.Satellite.Excluded == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Excluded(childComplexity), true
-
 	case "Satellite.hasTypeA":
 		if e.complexity.Satellite.HasTypeA == nil {
 			break
 		}
 
 		return e.complexity.Satellite.HasTypeA(childComplexity), true
-
 	case "Satellite.measurementId":
 		if e.complexity.Satellite.MeasurementId == nil {
 			break
 		}
 
 		return e.complexity.Satellite.MeasurementId(childComplexity), true
-
 	case "Satellite.receivedError":
 		if e.complexity.Satellite.ReceivedError == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ReceivedError(childComplexity), true
-
 	case "Satellite.receivedRcode":
 		if e.complexity.Satellite.ReceivedRcode == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ReceivedRcode(childComplexity), true
-
 	case "Satellite.resolverAsClass":
 		if e.complexity.Satellite.ResolverAsClass == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverAsClass(childComplexity), true
-
 	case "Satellite.resolverAsFullName":
 		if e.complexity.Satellite.ResolverAsFullName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverAsFullName(childComplexity), true
-
 	case "Satellite.resolverAsName":
 		if e.complexity.Satellite.ResolverAsName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverAsName(childComplexity), true
-
 	case "Satellite.resolverAsn":
 		if e.complexity.Satellite.ResolverAsn == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverAsn(childComplexity), true
-
 	case "Satellite.resolverConnectErrorRate":
 		if e.complexity.Satellite.ResolverConnectErrorRate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverConnectErrorRate(childComplexity), true
-
 	case "Satellite.resolverCountry":
 		if e.complexity.Satellite.ResolverCountry == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverCountry(childComplexity), true
-
 	case "Satellite.resolverInvalidCertRate":
 		if e.complexity.Satellite.ResolverInvalidCertRate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverInvalidCertRate(childComplexity), true
-
 	case "Satellite.resolverIp":
 		if e.complexity.Satellite.ResolverIp == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverIp(childComplexity), true
-
 	case "Satellite.resolverIsTrusted":
 		if e.complexity.Satellite.ResolverIsTrusted == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverIsTrusted(childComplexity), true
-
 	case "Satellite.resolverName":
 		if e.complexity.Satellite.ResolverName == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverName(childComplexity), true
-
 	case "Satellite.resolverNetblock":
 		if e.complexity.Satellite.ResolverNetblock == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverNetblock(childComplexity), true
-
 	case "Satellite.resolverNonZeroRcodeRate":
 		if e.complexity.Satellite.ResolverNonZeroRcodeRate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverNonZeroRcodeRate(childComplexity), true
-
 	case "Satellite.resolverOrganization":
 		if e.complexity.Satellite.ResolverOrganization == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverOrganization(childComplexity), true
-
 	case "Satellite.resolverPrivateIpRate":
 		if e.complexity.Satellite.ResolverPrivateIPRate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverPrivateIPRate(childComplexity), true
-
 	case "Satellite.resolverZeroIpRate":
 		if e.complexity.Satellite.ResolverZeroIPRate == nil {
 			break
 		}
 
 		return e.complexity.Satellite.ResolverZeroIPRate(childComplexity), true
-
 	case "Satellite.retry":
 		if e.complexity.Satellite.Retry == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Retry(childComplexity), true
-
 	case "Satellite.source":
 		if e.complexity.Satellite.Source == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Source(childComplexity), true
-
 	case "Satellite.startTime":
 		if e.complexity.Satellite.StartTime == nil {
 			break
 		}
 
 		return e.complexity.Satellite.StartTime(childComplexity), true
-
 	case "Satellite.success":
 		if e.complexity.Satellite.Success == nil {
 			break
 		}
 
 		return e.complexity.Satellite.Success(childComplexity), true
-
 	case "Satellite.untaggedControls":
 		if e.complexity.Satellite.UntaggedControls == nil {
 			break
 		}
 
 		return e.complexity.Satellite.UntaggedControls(childComplexity), true
-
 	case "Satellite.untaggedResponse":
 		if e.complexity.Satellite.UntaggedResponse == nil {
 			break
@@ -1142,8 +1137,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputDateRange,
 		ec.unmarshalInputFilterDashboard,
@@ -1152,7 +1147,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -1160,7 +1155,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -1364,6 +1359,22 @@ type InterferenceRateByCountry {
   unexpectedRate: Float!
 }
 
+type CenAlertTimeSeries {
+  value: Float!
+  date: Date!
+  country: String!
+}
+
+type CenAlertEvents {
+  country: String!
+  startDate: Date!
+  endDate: Date!
+  peak: Date!
+  impact: Float!
+  cause: String!
+  reportedBy: String!
+}
+
 input FilterHyperquack {
   protocol: String!
   domain: String!
@@ -1387,8 +1398,11 @@ input FilterDashboard {
   source: String!
 }
 
+"""Inclusive date range. Dates must be in YYYY-MM-DD."""
 input DateRange {
+  """Start date (YYYY-MM-DD)."""
   startDate: Date!
+  """End date (YYYY-MM-DD)."""
   endDate:   Date!
 }
 
@@ -1401,6 +1415,9 @@ type Query {
   interferenceRateByCountry(range: DateRange!): [InterferenceRateByCountry]!
   domains(range: DateRange!, protocol: String!): [String!]!
   countries(range: DateRange!, protocol: String!): [String!]!
+  cenalertTimeseries(range: DateRange, country: String!): [CenAlertTimeSeries!]!
+  cenalertCountries: [String!]!
+  cenalertEvents(range: DateRange, country: String): [CenAlertEvents!]!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1409,169 +1426,175 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "name", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
 	}
 	args["name"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_cenalertEvents_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.DateRange
-	if tmp, ok := rawArgs["range"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("range"))
-		arg0, err = ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalODateRange2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
 	}
 	args["range"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["protocol"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("protocol"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "country", ec.unmarshalOString2ᚖstring)
+	if err != nil {
+		return nil, err
+	}
+	args["country"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cenalertTimeseries_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalODateRange2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
+	}
+	args["range"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "country", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["country"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_countries_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
+	}
+	args["range"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "protocol", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
 	}
 	args["protocol"] = arg1
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_dashboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_dashboard_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.FilterDashboard
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNFilterDashboard2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterDashboard(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalNFilterDashboard2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterDashboard)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_domains_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_domains_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.DateRange
-	if tmp, ok := rawArgs["range"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("range"))
-		arg0, err = ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
 	}
 	args["range"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["protocol"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("protocol"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "protocol", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
 	}
 	args["protocol"] = arg1
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_hyperquack_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_hyperquack_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.FilterHyperquack
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNFilterHyperquack2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterHyperquack(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalNFilterHyperquack2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterHyperquack)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_interferenceRateByCountry_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_interferenceRateByCountry_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.DateRange
-	if tmp, ok := rawArgs["range"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("range"))
-		arg0, err = ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
 	}
 	args["range"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_measurementsCountByDate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_measurementsCountByDate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.DateRange
-	if tmp, ok := rawArgs["range"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("range"))
-		arg0, err = ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "range", ec.unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange)
+	if err != nil {
+		return nil, err
 	}
 	args["range"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_satellite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_satellite_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 model.FilterSatellite
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNFilterSatellite2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterSatellite(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalNFilterSatellite2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterSatellite)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 bool
-	if tmp, ok := rawArgs["includeDeprecated"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
-		arg0, err = ec.unmarshalOBoolean2bool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "includeDeprecated", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
 	}
 	args["includeDeprecated"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field___Field_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 bool
-	if tmp, ok := rawArgs["includeDeprecated"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
-		arg0, err = ec.unmarshalOBoolean2bool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "includeDeprecated", ec.unmarshalOBoolean2ᚖbool)
+	if err != nil {
+		return nil, err
+	}
+	args["includeDeprecated"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "includeDeprecated", ec.unmarshalOBoolean2bool)
+	if err != nil {
+		return nil, err
+	}
+	args["includeDeprecated"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "includeDeprecated", ec.unmarshalOBoolean2bool)
+	if err != nil {
+		return nil, err
 	}
 	args["includeDeprecated"] = arg0
 	return args, nil
@@ -1585,35 +1608,310 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _CenAlertEvents_country(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_country,
+		func(ctx context.Context) (any, error) {
+			return obj.Country, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_country(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_startDate(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_startDate,
+		func(ctx context.Context) (any, error) {
+			return obj.StartDate, nil
+		},
+		nil,
+		ec.marshalNDate2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_startDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_endDate(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_endDate,
+		func(ctx context.Context) (any, error) {
+			return obj.EndDate, nil
+		},
+		nil,
+		ec.marshalNDate2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_endDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_peak(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_peak,
+		func(ctx context.Context) (any, error) {
+			return obj.Peak, nil
+		},
+		nil,
+		ec.marshalNDate2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_peak(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_impact(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_impact,
+		func(ctx context.Context) (any, error) {
+			return obj.Impact, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_impact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_cause(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_cause,
+		func(ctx context.Context) (any, error) {
+			return obj.Cause, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_cause(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertEvents_reportedBy(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertEvents) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertEvents_reportedBy,
+		func(ctx context.Context) (any, error) {
+			return obj.ReportedBy, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertEvents_reportedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertEvents",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertTimeSeries_value(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertTimeSeries) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertTimeSeries_value,
+		func(ctx context.Context) (any, error) {
+			return obj.Value, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertTimeSeries_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertTimeSeries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertTimeSeries_date(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertTimeSeries) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertTimeSeries_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalNDate2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertTimeSeries_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertTimeSeries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CenAlertTimeSeries_country(ctx context.Context, field graphql.CollectedField, obj *entities.CenAlertTimeSeries) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CenAlertTimeSeries_country,
+		func(ctx context.Context) (any, error) {
+			return obj.Country, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CenAlertTimeSeries_country(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CenAlertTimeSeries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Dashboard_domain(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_domain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Domain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_domain,
+		func(ctx context.Context) (any, error) {
+			return obj.Domain, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_domain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1630,31 +1928,19 @@ func (ec *executionContext) fieldContext_Dashboard_domain(_ context.Context, fie
 }
 
 func (ec *executionContext) _Dashboard_date(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_date(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Date, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODate2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalODate2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1671,31 +1957,19 @@ func (ec *executionContext) fieldContext_Dashboard_date(_ context.Context, field
 }
 
 func (ec *executionContext) _Dashboard_hostName(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_hostName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HostName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_hostName,
+		func(ctx context.Context) (any, error) {
+			return obj.HostName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_hostName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1712,31 +1986,19 @@ func (ec *executionContext) fieldContext_Dashboard_hostName(_ context.Context, f
 }
 
 func (ec *executionContext) _Dashboard_regHostName(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_regHostName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RegHostName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_regHostName,
+		func(ctx context.Context) (any, error) {
+			return obj.RegHostName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_regHostName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1753,31 +2015,19 @@ func (ec *executionContext) fieldContext_Dashboard_regHostName(_ context.Context
 }
 
 func (ec *executionContext) _Dashboard_network(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_network(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Network, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_network,
+		func(ctx context.Context) (any, error) {
+			return obj.Network, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_network(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1794,31 +2044,19 @@ func (ec *executionContext) fieldContext_Dashboard_network(_ context.Context, fi
 }
 
 func (ec *executionContext) _Dashboard_subNetwork(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_subNetwork(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SubNetwork, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_subNetwork,
+		func(ctx context.Context) (any, error) {
+			return obj.SubNetwork, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_subNetwork(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1835,31 +2073,19 @@ func (ec *executionContext) fieldContext_Dashboard_subNetwork(_ context.Context,
 }
 
 func (ec *executionContext) _Dashboard_category(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_category(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Category, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_category,
+		func(ctx context.Context) (any, error) {
+			return obj.Category, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1876,31 +2102,19 @@ func (ec *executionContext) fieldContext_Dashboard_category(_ context.Context, f
 }
 
 func (ec *executionContext) _Dashboard_outcome(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_outcome(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Outcome, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_outcome,
+		func(ctx context.Context) (any, error) {
+			return obj.Outcome, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_outcome(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1917,31 +2131,19 @@ func (ec *executionContext) fieldContext_Dashboard_outcome(_ context.Context, fi
 }
 
 func (ec *executionContext) _Dashboard_count(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalOInt2int32(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_count,
+		func(ctx context.Context) (any, error) {
+			return obj.Count, nil
+		},
+		nil,
+		ec.marshalOInt2int32,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1958,31 +2160,19 @@ func (ec *executionContext) fieldContext_Dashboard_count(_ context.Context, fiel
 }
 
 func (ec *executionContext) _Dashboard_unexpectedCount(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_unexpectedCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UnexpectedCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalOInt2int32(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_unexpectedCount,
+		func(ctx context.Context) (any, error) {
+			return obj.UnexpectedCount, nil
+		},
+		nil,
+		ec.marshalOInt2int32,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_unexpectedCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1999,31 +2189,19 @@ func (ec *executionContext) fieldContext_Dashboard_unexpectedCount(_ context.Con
 }
 
 func (ec *executionContext) _Dashboard_country(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_country(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Country, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_country,
+		func(ctx context.Context) (any, error) {
+			return obj.Country, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_country(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2040,31 +2218,19 @@ func (ec *executionContext) fieldContext_Dashboard_country(_ context.Context, fi
 }
 
 func (ec *executionContext) _Dashboard_source(ctx context.Context, field graphql.CollectedField, obj *entities.Dashboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Dashboard_source(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Source, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Dashboard_source,
+		func(ctx context.Context) (any, error) {
+			return obj.Source, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Dashboard_source(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2081,34 +2247,19 @@ func (ec *executionContext) fieldContext_Dashboard_source(_ context.Context, fie
 }
 
 func (ec *executionContext) _Hyperquack_domain(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_domain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Domain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_domain,
+		func(ctx context.Context) (any, error) {
+			return obj.Domain, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_domain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2125,31 +2276,19 @@ func (ec *executionContext) fieldContext_Hyperquack_domain(_ context.Context, fi
 }
 
 func (ec *executionContext) _Hyperquack_domainCategory(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_domainCategory(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DomainCategory, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_domainCategory,
+		func(ctx context.Context) (any, error) {
+			return obj.DomainCategory, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_domainCategory(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2166,31 +2305,19 @@ func (ec *executionContext) fieldContext_Hyperquack_domainCategory(_ context.Con
 }
 
 func (ec *executionContext) _Hyperquack_domainIsControl(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_domainIsControl(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DomainIsControl, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_domainIsControl,
+		func(ctx context.Context) (any, error) {
+			return obj.DomainIsControl, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_domainIsControl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2207,31 +2334,19 @@ func (ec *executionContext) fieldContext_Hyperquack_domainIsControl(_ context.Co
 }
 
 func (ec *executionContext) _Hyperquack_date(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_date(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Date, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODate2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalODate2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2248,31 +2363,19 @@ func (ec *executionContext) fieldContext_Hyperquack_date(_ context.Context, fiel
 }
 
 func (ec *executionContext) _Hyperquack_startTime(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_startTime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.StartTime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_startTime,
+		func(ctx context.Context) (any, error) {
+			return obj.StartTime, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_startTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2289,31 +2392,19 @@ func (ec *executionContext) fieldContext_Hyperquack_startTime(_ context.Context,
 }
 
 func (ec *executionContext) _Hyperquack_endTime(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_endTime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EndTime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_endTime,
+		func(ctx context.Context) (any, error) {
+			return obj.EndTime, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_endTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2330,31 +2421,19 @@ func (ec *executionContext) fieldContext_Hyperquack_endTime(_ context.Context, f
 }
 
 func (ec *executionContext) _Hyperquack_retry(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_retry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Hyperquack().Retry(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_retry,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Hyperquack().Retry(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_retry(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2371,31 +2450,19 @@ func (ec *executionContext) fieldContext_Hyperquack_retry(_ context.Context, fie
 }
 
 func (ec *executionContext) _Hyperquack_serverIp(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverIp(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerIp, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverIp,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerIp, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverIp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2412,31 +2479,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverIp(_ context.Context, 
 }
 
 func (ec *executionContext) _Hyperquack_serverNetblock(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverNetblock(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerNetblock, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverNetblock,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerNetblock, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverNetblock(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2453,31 +2508,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverNetblock(_ context.Con
 }
 
 func (ec *executionContext) _Hyperquack_serverAsn(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverAsn(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Hyperquack().ServerAsn(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverAsn,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Hyperquack().ServerAsn(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverAsn(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2494,31 +2537,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverAsn(_ context.Context,
 }
 
 func (ec *executionContext) _Hyperquack_serverAsName(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverAsName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerAsName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverAsName,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerAsName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverAsName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2535,31 +2566,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverAsName(_ context.Conte
 }
 
 func (ec *executionContext) _Hyperquack_serverAsFullName(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverAsFullName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerAsFullName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverAsFullName,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerAsFullName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverAsFullName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2576,31 +2595,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverAsFullName(_ context.C
 }
 
 func (ec *executionContext) _Hyperquack_serverAsClass(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverAsClass(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerAsClass, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverAsClass,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerAsClass, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverAsClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2617,31 +2624,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverAsClass(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_serverCountry(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverCountry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerCountry, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverCountry,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerCountry, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverCountry(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2658,31 +2653,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverCountry(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_serverOrganization(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_serverOrganization(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ServerOrganization, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_serverOrganization,
+		func(ctx context.Context) (any, error) {
+			return obj.ServerOrganization, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_serverOrganization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2699,31 +2682,19 @@ func (ec *executionContext) fieldContext_Hyperquack_serverOrganization(_ context
 }
 
 func (ec *executionContext) _Hyperquack_receivedError(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedError(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedError, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedError,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedError, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2740,31 +2711,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedError(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsVersion(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsVersion(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Hyperquack().ReceivedTLSVersion(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsVersion,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Hyperquack().ReceivedTLSVersion(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2781,31 +2740,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsVersion(_ context
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCipherSuite(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCipherSuite(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Hyperquack().ReceivedTLSCipherSuite(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCipherSuite,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Hyperquack().ReceivedTLSCipherSuite(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCipherSuite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2822,31 +2769,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCipherSuite(_ con
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCert(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCert(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedTlsCert, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCert,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedTlsCert, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCert(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2863,31 +2798,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCert(_ context.Co
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCertMatchesDomain(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCertMatchesDomain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedTlsCertMatchesDomain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCertMatchesDomain,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedTlsCertMatchesDomain, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertMatchesDomain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2904,31 +2827,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertMatchesDomain
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCertCommonName(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCertCommonName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedTlsCertCommonName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCertCommonName,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedTlsCertCommonName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertCommonName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2945,31 +2856,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertCommonName(_ 
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCertIssuer(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCertIssuer(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedTlsCertIssuer, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCertIssuer,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedTlsCertIssuer, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertIssuer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2986,31 +2885,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertIssuer(_ cont
 }
 
 func (ec *executionContext) _Hyperquack_receivedTlsCertAlternativeNames(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedTlsCertAlternativeNames(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedTlsCertAlternativeNames, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedTlsCertAlternativeNames,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedTlsCertAlternativeNames, nil
+		},
+		nil,
+		ec.marshalOString2ᚕstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertAlternativeNames(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3027,31 +2914,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedTlsCertAlternativeNa
 }
 
 func (ec *executionContext) _Hyperquack_receivedStatus(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedStatus(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedStatus, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedStatus,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedStatus, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3068,31 +2943,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedStatus(_ context.Con
 }
 
 func (ec *executionContext) _Hyperquack_receivedHeaders(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedHeaders(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedHeaders, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedHeaders,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedHeaders, nil
+		},
+		nil,
+		ec.marshalOString2ᚕstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedHeaders(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3109,31 +2972,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedHeaders(_ context.Co
 }
 
 func (ec *executionContext) _Hyperquack_receivedBody(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_receivedBody(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedBody, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_receivedBody,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedBody, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_receivedBody(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3150,31 +3001,19 @@ func (ec *executionContext) fieldContext_Hyperquack_receivedBody(_ context.Conte
 }
 
 func (ec *executionContext) _Hyperquack_isKnownBlockpage(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_isKnownBlockpage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsKnownBlockpage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_isKnownBlockpage,
+		func(ctx context.Context) (any, error) {
+			return obj.IsKnownBlockpage, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_isKnownBlockpage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3191,31 +3030,19 @@ func (ec *executionContext) fieldContext_Hyperquack_isKnownBlockpage(_ context.C
 }
 
 func (ec *executionContext) _Hyperquack_pageSignature(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_pageSignature(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageSignature, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_pageSignature,
+		func(ctx context.Context) (any, error) {
+			return obj.PageSignature, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_pageSignature(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3232,31 +3059,19 @@ func (ec *executionContext) fieldContext_Hyperquack_pageSignature(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_outcome(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_outcome(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Outcome, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_outcome,
+		func(ctx context.Context) (any, error) {
+			return obj.Outcome, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_outcome(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3273,31 +3088,19 @@ func (ec *executionContext) fieldContext_Hyperquack_outcome(_ context.Context, f
 }
 
 func (ec *executionContext) _Hyperquack_matchesTemplate(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_matchesTemplate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MatchesTemplate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_matchesTemplate,
+		func(ctx context.Context) (any, error) {
+			return obj.MatchesTemplate, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_matchesTemplate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3314,31 +3117,19 @@ func (ec *executionContext) fieldContext_Hyperquack_matchesTemplate(_ context.Co
 }
 
 func (ec *executionContext) _Hyperquack_noResponseInMeasurementMatchesTemplate(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_noResponseInMeasurementMatchesTemplate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.NoResponseInMeasurementMatchesTemplate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_noResponseInMeasurementMatchesTemplate,
+		func(ctx context.Context) (any, error) {
+			return obj.NoResponseInMeasurementMatchesTemplate, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_noResponseInMeasurementMatchesTemplate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3355,31 +3146,19 @@ func (ec *executionContext) fieldContext_Hyperquack_noResponseInMeasurementMatch
 }
 
 func (ec *executionContext) _Hyperquack_controlsFailed(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_controlsFailed(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ControlsFailed, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_controlsFailed,
+		func(ctx context.Context) (any, error) {
+			return obj.ControlsFailed, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_controlsFailed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3396,31 +3175,19 @@ func (ec *executionContext) fieldContext_Hyperquack_controlsFailed(_ context.Con
 }
 
 func (ec *executionContext) _Hyperquack_statefulBlock(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_statefulBlock(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.StatefulBlock, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_statefulBlock,
+		func(ctx context.Context) (any, error) {
+			return obj.StatefulBlock, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_statefulBlock(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3437,31 +3204,19 @@ func (ec *executionContext) fieldContext_Hyperquack_statefulBlock(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_measurementId(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_measurementId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MeasurementId, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_measurementId,
+		func(ctx context.Context) (any, error) {
+			return obj.MeasurementId, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_measurementId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3478,31 +3233,19 @@ func (ec *executionContext) fieldContext_Hyperquack_measurementId(_ context.Cont
 }
 
 func (ec *executionContext) _Hyperquack_source(ctx context.Context, field graphql.CollectedField, obj *entities.Hyperquack) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Hyperquack_source(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Source, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Hyperquack_source,
+		func(ctx context.Context) (any, error) {
+			return obj.Source, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Hyperquack_source(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3519,34 +3262,19 @@ func (ec *executionContext) fieldContext_Hyperquack_source(_ context.Context, fi
 }
 
 func (ec *executionContext) _InterferenceRateByCountry_country(ctx context.Context, field graphql.CollectedField, obj *entities.InterferenceRateByCountry) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_InterferenceRateByCountry_country(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Country, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_InterferenceRateByCountry_country,
+		func(ctx context.Context) (any, error) {
+			return obj.Country, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_InterferenceRateByCountry_country(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3563,34 +3291,19 @@ func (ec *executionContext) fieldContext_InterferenceRateByCountry_country(_ con
 }
 
 func (ec *executionContext) _InterferenceRateByCountry_unexpectedRate(ctx context.Context, field graphql.CollectedField, obj *entities.InterferenceRateByCountry) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_InterferenceRateByCountry_unexpectedRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UnexpectedCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(float64)
-	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_InterferenceRateByCountry_unexpectedRate,
+		func(ctx context.Context) (any, error) {
+			return obj.UnexpectedCount, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_InterferenceRateByCountry_unexpectedRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3607,34 +3320,20 @@ func (ec *executionContext) fieldContext_InterferenceRateByCountry_unexpectedRat
 }
 
 func (ec *executionContext) _Query_hyperquack(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_hyperquack(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Hyperquack(rctx, fc.Args["filter"].(model.FilterHyperquack))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*entities.Hyperquack)
-	fc.Result = res
-	return ec.marshalNHyperquack2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐHyperquack(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_hyperquack,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Hyperquack(ctx, fc.Args["filter"].(model.FilterHyperquack))
+		},
+		nil,
+		ec.marshalNHyperquack2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐHyperquack,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_hyperquack(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3734,34 +3433,20 @@ func (ec *executionContext) fieldContext_Query_hyperquack(ctx context.Context, f
 }
 
 func (ec *executionContext) _Query_satellite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_satellite(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Satellite(rctx, fc.Args["filter"].(model.FilterSatellite))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*entities.Satellite)
-	fc.Result = res
-	return ec.marshalNSatellite2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐSatellite(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_satellite,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Satellite(ctx, fc.Args["filter"].(model.FilterSatellite))
+		},
+		nil,
+		ec.marshalNSatellite2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐSatellite,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_satellite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3921,34 +3606,20 @@ func (ec *executionContext) fieldContext_Query_satellite(ctx context.Context, fi
 }
 
 func (ec *executionContext) _Query_dashboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_dashboard(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Dashboard(rctx, fc.Args["filter"].(model.FilterDashboard))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*entities.Dashboard)
-	fc.Result = res
-	return ec.marshalNDashboard2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐDashboard(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_dashboard,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Dashboard(ctx, fc.Args["filter"].(model.FilterDashboard))
+		},
+		nil,
+		ec.marshalNDashboard2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐDashboard,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_dashboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4002,34 +3673,19 @@ func (ec *executionContext) fieldContext_Query_dashboard(ctx context.Context, fi
 }
 
 func (ec *executionContext) _Query_totalMeasurementsCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_totalMeasurementsCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TotalMeasurementsCount(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_totalMeasurementsCount,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().TotalMeasurementsCount(ctx)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_totalMeasurementsCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4046,34 +3702,20 @@ func (ec *executionContext) fieldContext_Query_totalMeasurementsCount(_ context.
 }
 
 func (ec *executionContext) _Query_measurementsCountByDate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_measurementsCountByDate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().MeasurementsCountByDate(rctx, fc.Args["range"].(model.DateRange))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_measurementsCountByDate,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().MeasurementsCountByDate(ctx, fc.Args["range"].(model.DateRange))
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_measurementsCountByDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4101,34 +3743,20 @@ func (ec *executionContext) fieldContext_Query_measurementsCountByDate(ctx conte
 }
 
 func (ec *executionContext) _Query_interferenceRateByCountry(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_interferenceRateByCountry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().InterferenceRateByCountry(rctx, fc.Args["range"].(model.DateRange))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*entities.InterferenceRateByCountry)
-	fc.Result = res
-	return ec.marshalNInterferenceRateByCountry2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐInterferenceRateByCountry(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_interferenceRateByCountry,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().InterferenceRateByCountry(ctx, fc.Args["range"].(model.DateRange))
+		},
+		nil,
+		ec.marshalNInterferenceRateByCountry2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐInterferenceRateByCountry,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_interferenceRateByCountry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4162,34 +3790,20 @@ func (ec *executionContext) fieldContext_Query_interferenceRateByCountry(ctx con
 }
 
 func (ec *executionContext) _Query_domains(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_domains(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Domains(rctx, fc.Args["range"].(model.DateRange), fc.Args["protocol"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_domains,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Domains(ctx, fc.Args["range"].(model.DateRange), fc.Args["protocol"].(string))
+		},
+		nil,
+		ec.marshalNString2ᚕstringᚄ,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_domains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4217,34 +3831,20 @@ func (ec *executionContext) fieldContext_Query_domains(ctx context.Context, fiel
 }
 
 func (ec *executionContext) _Query_countries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_countries(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Countries(rctx, fc.Args["range"].(model.DateRange), fc.Args["protocol"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_countries,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Countries(ctx, fc.Args["range"].(model.DateRange), fc.Args["protocol"].(string))
+		},
+		nil,
+		ec.marshalNString2ᚕstringᚄ,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query_countries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4271,32 +3871,156 @@ func (ec *executionContext) fieldContext_Query_countries(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query___type(ctx, field)
-	if err != nil {
-		return graphql.Null
+func (ec *executionContext) _Query_cenalertTimeseries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cenalertTimeseries,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CenalertTimeseries(ctx, fc.Args["range"].(*model.DateRange), fc.Args["country"].(string))
+		},
+		nil,
+		ec.marshalNCenAlertTimeSeries2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertTimeSeriesᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cenalertTimeseries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "value":
+				return ec.fieldContext_CenAlertTimeSeries_value(ctx, field)
+			case "date":
+				return ec.fieldContext_CenAlertTimeSeries_date(ctx, field)
+			case "country":
+				return ec.fieldContext_CenAlertTimeSeries_country(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CenAlertTimeSeries", field.Name)
+		},
 	}
-	ctx = graphql.WithFieldContext(ctx, fc)
 	defer func() {
 		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.introspectType(fc.Args["name"].(string))
-	})
-	if err != nil {
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cenalertTimeseries_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
+		return fc, err
 	}
-	if resTmp == nil {
-		return graphql.Null
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cenalertCountries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cenalertCountries,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().CenalertCountries(ctx)
+		},
+		nil,
+		ec.marshalNString2ᚕstringᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cenalertCountries(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
 	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cenalertEvents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_cenalertEvents,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().CenalertEvents(ctx, fc.Args["range"].(*model.DateRange), fc.Args["country"].(*string))
+		},
+		nil,
+		ec.marshalNCenAlertEvents2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertEventsᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_cenalertEvents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "country":
+				return ec.fieldContext_CenAlertEvents_country(ctx, field)
+			case "startDate":
+				return ec.fieldContext_CenAlertEvents_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_CenAlertEvents_endDate(ctx, field)
+			case "peak":
+				return ec.fieldContext_CenAlertEvents_peak(ctx, field)
+			case "impact":
+				return ec.fieldContext_CenAlertEvents_impact(ctx, field)
+			case "cause":
+				return ec.fieldContext_CenAlertEvents_cause(ctx, field)
+			case "reportedBy":
+				return ec.fieldContext_CenAlertEvents_reportedBy(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CenAlertEvents", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_cenalertEvents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query___type,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.introspectType(fc.Args["name"].(string))
+		},
+		nil,
+		ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4313,6 +4037,8 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -4325,8 +4051,8 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -4346,31 +4072,19 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 }
 
 func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query___schema(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.introspectSchema()
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Schema)
-	fc.Result = res
-	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query___schema,
+		func(ctx context.Context) (any, error) {
+			return ec.introspectSchema()
+		},
+		nil,
+		ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4401,34 +4115,19 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 }
 
 func (ec *executionContext) _Satellite_domain(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_domain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Domain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_domain,
+		func(ctx context.Context) (any, error) {
+			return obj.Domain, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_domain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4445,31 +4144,19 @@ func (ec *executionContext) fieldContext_Satellite_domain(_ context.Context, fie
 }
 
 func (ec *executionContext) _Satellite_domainCategory(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_domainCategory(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DomainCategory, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_domainCategory,
+		func(ctx context.Context) (any, error) {
+			return obj.DomainCategory, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_domainCategory(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4486,31 +4173,19 @@ func (ec *executionContext) fieldContext_Satellite_domainCategory(_ context.Cont
 }
 
 func (ec *executionContext) _Satellite_domainIsControl(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_domainIsControl(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DomainIsControl, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_domainIsControl,
+		func(ctx context.Context) (any, error) {
+			return obj.DomainIsControl, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_domainIsControl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4527,31 +4202,19 @@ func (ec *executionContext) fieldContext_Satellite_domainIsControl(_ context.Con
 }
 
 func (ec *executionContext) _Satellite_date(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_date(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Date, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODate2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_date,
+		func(ctx context.Context) (any, error) {
+			return obj.Date, nil
+		},
+		nil,
+		ec.marshalODate2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4568,31 +4231,19 @@ func (ec *executionContext) fieldContext_Satellite_date(_ context.Context, field
 }
 
 func (ec *executionContext) _Satellite_startTime(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_startTime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.StartTime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_startTime,
+		func(ctx context.Context) (any, error) {
+			return obj.StartTime, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_startTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4609,31 +4260,19 @@ func (ec *executionContext) fieldContext_Satellite_startTime(_ context.Context, 
 }
 
 func (ec *executionContext) _Satellite_endTime(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_endTime(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EndTime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_endTime,
+		func(ctx context.Context) (any, error) {
+			return obj.EndTime, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_endTime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4650,31 +4289,19 @@ func (ec *executionContext) fieldContext_Satellite_endTime(_ context.Context, fi
 }
 
 func (ec *executionContext) _Satellite_retry(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_retry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().Retry(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_retry,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().Retry(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_retry(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4691,31 +4318,19 @@ func (ec *executionContext) fieldContext_Satellite_retry(_ context.Context, fiel
 }
 
 func (ec *executionContext) _Satellite_resolverIp(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverIp(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverIp, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverIp,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverIp, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverIp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4732,31 +4347,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverIp(_ context.Context,
 }
 
 func (ec *executionContext) _Satellite_resolverName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverName,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4773,31 +4376,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverName(_ context.Contex
 }
 
 func (ec *executionContext) _Satellite_resolverIsTrusted(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverIsTrusted(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverIsTrusted, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverIsTrusted,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverIsTrusted, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverIsTrusted(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4814,31 +4405,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverIsTrusted(_ context.C
 }
 
 func (ec *executionContext) _Satellite_resolverNetblock(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverNetblock(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverNetblock, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverNetblock,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverNetblock, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverNetblock(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4855,31 +4434,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverNetblock(_ context.Co
 }
 
 func (ec *executionContext) _Satellite_resolverAsn(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverAsn(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverAsn(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverAsn,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverAsn(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverAsn(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4896,31 +4463,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverAsn(_ context.Context
 }
 
 func (ec *executionContext) _Satellite_resolverAsName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverAsName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverAsName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverAsName,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverAsName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverAsName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4937,31 +4492,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverAsName(_ context.Cont
 }
 
 func (ec *executionContext) _Satellite_resolverAsFullName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverAsFullName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverAsFullName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverAsFullName,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverAsFullName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverAsFullName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4978,31 +4521,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverAsFullName(_ context.
 }
 
 func (ec *executionContext) _Satellite_resolverAsClass(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverAsClass(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverAsClass, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverAsClass,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverAsClass, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverAsClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5019,31 +4550,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverAsClass(_ context.Con
 }
 
 func (ec *executionContext) _Satellite_resolverCountry(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverCountry(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverCountry, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverCountry,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverCountry, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverCountry(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5060,31 +4579,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverCountry(_ context.Con
 }
 
 func (ec *executionContext) _Satellite_resolverOrganization(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverOrganization(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ResolverOrganization, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverOrganization,
+		func(ctx context.Context) (any, error) {
+			return obj.ResolverOrganization, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverOrganization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5101,31 +4608,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverOrganization(_ contex
 }
 
 func (ec *executionContext) _Satellite_resolverNonZeroRcodeRate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverNonZeroRcodeRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverNonZeroRcodeRate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverNonZeroRcodeRate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverNonZeroRcodeRate(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverNonZeroRcodeRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5142,31 +4637,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverNonZeroRcodeRate(_ co
 }
 
 func (ec *executionContext) _Satellite_resolverPrivateIpRate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverPrivateIpRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverPrivateIPRate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverPrivateIpRate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverPrivateIPRate(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverPrivateIpRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5183,31 +4666,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverPrivateIpRate(_ conte
 }
 
 func (ec *executionContext) _Satellite_resolverZeroIpRate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverZeroIpRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverZeroIPRate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverZeroIpRate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverZeroIPRate(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverZeroIpRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5224,31 +4695,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverZeroIpRate(_ context.
 }
 
 func (ec *executionContext) _Satellite_resolverConnectErrorRate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverConnectErrorRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverConnectErrorRate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverConnectErrorRate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverConnectErrorRate(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverConnectErrorRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5265,31 +4724,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverConnectErrorRate(_ co
 }
 
 func (ec *executionContext) _Satellite_resolverInvalidCertRate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_resolverInvalidCertRate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ResolverInvalidCertRate(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_resolverInvalidCertRate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ResolverInvalidCertRate(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_resolverInvalidCertRate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5306,31 +4753,19 @@ func (ec *executionContext) fieldContext_Satellite_resolverInvalidCertRate(_ con
 }
 
 func (ec *executionContext) _Satellite_receivedError(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_receivedError(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ReceivedError, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_receivedError,
+		func(ctx context.Context) (any, error) {
+			return obj.ReceivedError, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_receivedError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5347,31 +4782,19 @@ func (ec *executionContext) fieldContext_Satellite_receivedError(_ context.Conte
 }
 
 func (ec *executionContext) _Satellite_receivedRcode(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_receivedRcode(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().ReceivedRcode(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_receivedRcode,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().ReceivedRcode(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_receivedRcode(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5388,31 +4811,19 @@ func (ec *executionContext) fieldContext_Satellite_receivedRcode(_ context.Conte
 }
 
 func (ec *executionContext) _Satellite_answersIp(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersIp(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersIp, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersIp,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersIp, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersIp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5429,31 +4840,19 @@ func (ec *executionContext) fieldContext_Satellite_answersIp(_ context.Context, 
 }
 
 func (ec *executionContext) _Satellite_answersAsn(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersAsn(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().AnswersAsn(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚕᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersAsn,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().AnswersAsn(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚕᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersAsn(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5470,31 +4869,19 @@ func (ec *executionContext) fieldContext_Satellite_answersAsn(_ context.Context,
 }
 
 func (ec *executionContext) _Satellite_answersAsName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersAsName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersAsName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersAsName,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersAsName, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersAsName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5511,31 +4898,19 @@ func (ec *executionContext) fieldContext_Satellite_answersAsName(_ context.Conte
 }
 
 func (ec *executionContext) _Satellite_answersIpOrganization(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersIpOrganization(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersIpOrganization, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersIpOrganization,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersIpOrganization, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersIpOrganization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5552,31 +4927,19 @@ func (ec *executionContext) fieldContext_Satellite_answersIpOrganization(_ conte
 }
 
 func (ec *executionContext) _Satellite_answersCensysHttpBodyHash(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersCensysHttpBodyHash(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersCensysHttpBodyHash, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersCensysHttpBodyHash,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersCensysHttpBodyHash, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersCensysHttpBodyHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5593,31 +4956,19 @@ func (ec *executionContext) fieldContext_Satellite_answersCensysHttpBodyHash(_ c
 }
 
 func (ec *executionContext) _Satellite_answersCensysIpCert(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersCensysIpCert(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersCensysIpCert, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersCensysIpCert,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersCensysIpCert, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersCensysIpCert(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5634,31 +4985,19 @@ func (ec *executionContext) fieldContext_Satellite_answersCensysIpCert(_ context
 }
 
 func (ec *executionContext) _Satellite_answersMatchesControlIp(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchesControlIp(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersMatchesControlIp, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchesControlIp,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersMatchesControlIp, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchesControlIp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5675,31 +5014,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchesControlIp(_ con
 }
 
 func (ec *executionContext) _Satellite_answersMatchesControlCensysHttpBodyHash(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchesControlCensysHttpBodyHash(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersMatchesControlCensysHttpBodyHash, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchesControlCensysHttpBodyHash,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersMatchesControlCensysHttpBodyHash, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchesControlCensysHttpBodyHash(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5716,31 +5043,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchesControlCensysHt
 }
 
 func (ec *executionContext) _Satellite_answersMatchesControlCensysIpCert(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchesControlCensysIpCert(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersMatchesControlCensysIpCert, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchesControlCensysIpCert,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersMatchesControlCensysIpCert, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchesControlCensysIpCert(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5757,31 +5072,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchesControlCensysIp
 }
 
 func (ec *executionContext) _Satellite_answersMatchesControlAsn(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchesControlAsn(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersMatchesControlAsn, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchesControlAsn,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersMatchesControlAsn, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchesControlAsn(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5798,31 +5101,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchesControlAsn(_ co
 }
 
 func (ec *executionContext) _Satellite_answersMatchesControlAsName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchesControlAsName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersMatchesControlAsName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchesControlAsName,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersMatchesControlAsName, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchesControlAsName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5839,31 +5130,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchesControlAsName(_
 }
 
 func (ec *executionContext) _Satellite_answersMatchConfidence(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersMatchConfidence(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().AnswersMatchConfidence(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚕᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersMatchConfidence,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().AnswersMatchConfidence(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚕᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersMatchConfidence(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5880,31 +5159,19 @@ func (ec *executionContext) fieldContext_Satellite_answersMatchConfidence(_ cont
 }
 
 func (ec *executionContext) _Satellite_answersHttpError(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpError(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpError, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpError,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpError, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5921,31 +5188,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpError(_ context.Co
 }
 
 func (ec *executionContext) _Satellite_answersHttpResponseStatus(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpResponseStatus(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpResponseStatus, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpResponseStatus,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpResponseStatus, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpResponseStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5962,31 +5217,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpResponseStatus(_ c
 }
 
 func (ec *executionContext) _Satellite_answersHttpAnalysisIsKnownBlockpage(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpAnalysisIsKnownBlockpage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpAnalysisIsKnownBlockpage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpAnalysisIsKnownBlockpage,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpAnalysisIsKnownBlockpage, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpAnalysisIsKnownBlockpage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6003,31 +5246,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpAnalysisIsKnownBlo
 }
 
 func (ec *executionContext) _Satellite_answersHttpAnalysisPageSignature(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpAnalysisPageSignature(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpAnalysisPageSignature, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpAnalysisPageSignature,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpAnalysisPageSignature, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpAnalysisPageSignature(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6044,31 +5275,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpAnalysisPageSignat
 }
 
 func (ec *executionContext) _Satellite_answersHttpsError(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsError(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsError, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsError,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsError, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsError(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6085,31 +5304,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsError(_ context.C
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsVersion(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsVersion(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().AnswersHTTPSTLSVersion(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚕᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsVersion,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().AnswersHTTPSTLSVersion(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚕᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsVersion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6126,31 +5333,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsVersion(_ cont
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCipherSuite(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCipherSuite(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().AnswersHTTPSTLSCipherSuite(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*int)
-	fc.Result = res
-	return ec.marshalOInt2ᚕᚖint(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCipherSuite,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().AnswersHTTPSTLSCipherSuite(ctx, obj)
+		},
+		nil,
+		ec.marshalOInt2ᚕᚖint,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCipherSuite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6167,31 +5362,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCipherSuite(_ 
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCert(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCert(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCert, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCert,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCert, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCert(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6208,31 +5391,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCert(_ context
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertCommonName(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertCommonName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertCommonName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertCommonName,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertCommonName, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertCommonName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6249,31 +5420,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertCommonName
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertIssuer(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertIssuer(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertIssuer, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertIssuer,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertIssuer, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertIssuer(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6290,31 +5449,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertIssuer(_ c
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertStartDate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertStartDate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertStartDate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚕᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertStartDate,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertStartDate, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚕᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertStartDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6331,31 +5478,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertStartDate(
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertEndDate(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertEndDate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertEndDate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*time.Time)
-	fc.Result = res
-	return ec.marshalODateTime2ᚕᚖtimeᚐTime(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertEndDate,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertEndDate, nil
+		},
+		nil,
+		ec.marshalODateTime2ᚕᚖtimeᚐTime,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertEndDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6372,31 +5507,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertEndDate(_ 
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertAlternativeNames(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertAlternativeNames(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertAlternativeNames, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([][]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚕstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertAlternativeNames,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertAlternativeNames, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚕstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertAlternativeNames(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6413,31 +5536,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertAlternativ
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertHasTrustedCa(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertHasTrustedCa(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertHasTrustedCa, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertHasTrustedCa,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertHasTrustedCa, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertHasTrustedCa(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6454,31 +5565,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertHasTrusted
 }
 
 func (ec *executionContext) _Satellite_answersHttpsTlsCertMatchesDomain(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsTlsCertMatchesDomain(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsTlsCertMatchesDomain, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsTlsCertMatchesDomain,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsTlsCertMatchesDomain, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertMatchesDomain(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6495,31 +5594,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsTlsCertMatchesDom
 }
 
 func (ec *executionContext) _Satellite_answersHttpsResponseStatus(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsResponseStatus(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsResponseStatus, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsResponseStatus,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsResponseStatus, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsResponseStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6536,31 +5623,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsResponseStatus(_ 
 }
 
 func (ec *executionContext) _Satellite_answersHttpsAnalysisIsKnownBlockpage(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsAnalysisIsKnownBlockpage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsAnalysisIsKnownBlockpage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚕᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsAnalysisIsKnownBlockpage,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsAnalysisIsKnownBlockpage, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚕᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsAnalysisIsKnownBlockpage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6577,31 +5652,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsAnalysisIsKnownBl
 }
 
 func (ec *executionContext) _Satellite_answersHttpsAnalysisPageSignature(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_answersHttpsAnalysisPageSignature(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AnswersHttpsAnalysisPageSignature, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*string)
-	fc.Result = res
-	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_answersHttpsAnalysisPageSignature,
+		func(ctx context.Context) (any, error) {
+			return obj.AnswersHttpsAnalysisPageSignature, nil
+		},
+		nil,
+		ec.marshalOString2ᚕᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_answersHttpsAnalysisPageSignature(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6618,31 +5681,19 @@ func (ec *executionContext) fieldContext_Satellite_answersHttpsAnalysisPageSigna
 }
 
 func (ec *executionContext) _Satellite_success(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_success(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6659,31 +5710,19 @@ func (ec *executionContext) fieldContext_Satellite_success(_ context.Context, fi
 }
 
 func (ec *executionContext) _Satellite_anomaly(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_anomaly(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Anomaly, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_anomaly,
+		func(ctx context.Context) (any, error) {
+			return obj.Anomaly, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_anomaly(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6700,31 +5739,19 @@ func (ec *executionContext) fieldContext_Satellite_anomaly(_ context.Context, fi
 }
 
 func (ec *executionContext) _Satellite_domainControlsFailed(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_domainControlsFailed(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DomainControlsFailed, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_domainControlsFailed,
+		func(ctx context.Context) (any, error) {
+			return obj.DomainControlsFailed, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_domainControlsFailed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6741,31 +5768,19 @@ func (ec *executionContext) fieldContext_Satellite_domainControlsFailed(_ contex
 }
 
 func (ec *executionContext) _Satellite_averageConfidence(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_averageConfidence(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Satellite().AverageConfidence(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_averageConfidence,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Satellite().AverageConfidence(ctx, obj)
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_averageConfidence(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6782,31 +5797,19 @@ func (ec *executionContext) fieldContext_Satellite_averageConfidence(_ context.C
 }
 
 func (ec *executionContext) _Satellite_untaggedControls(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_untaggedControls(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UntaggedControls, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_untaggedControls,
+		func(ctx context.Context) (any, error) {
+			return obj.UntaggedControls, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_untaggedControls(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6823,31 +5826,19 @@ func (ec *executionContext) fieldContext_Satellite_untaggedControls(_ context.Co
 }
 
 func (ec *executionContext) _Satellite_untaggedResponse(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_untaggedResponse(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UntaggedResponse, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_untaggedResponse,
+		func(ctx context.Context) (any, error) {
+			return obj.UntaggedResponse, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_untaggedResponse(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6864,31 +5855,19 @@ func (ec *executionContext) fieldContext_Satellite_untaggedResponse(_ context.Co
 }
 
 func (ec *executionContext) _Satellite_excluded(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_excluded(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Excluded, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_excluded,
+		func(ctx context.Context) (any, error) {
+			return obj.Excluded, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_excluded(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6905,31 +5884,19 @@ func (ec *executionContext) fieldContext_Satellite_excluded(_ context.Context, f
 }
 
 func (ec *executionContext) _Satellite_excludeReason(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_excludeReason(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ExcludeReason, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_excludeReason,
+		func(ctx context.Context) (any, error) {
+			return obj.ExcludeReason, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_excludeReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6946,31 +5913,19 @@ func (ec *executionContext) fieldContext_Satellite_excludeReason(_ context.Conte
 }
 
 func (ec *executionContext) _Satellite_hasTypeA(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_hasTypeA(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HasTypeA, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_hasTypeA,
+		func(ctx context.Context) (any, error) {
+			return obj.HasTypeA, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_hasTypeA(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6987,31 +5942,19 @@ func (ec *executionContext) fieldContext_Satellite_hasTypeA(_ context.Context, f
 }
 
 func (ec *executionContext) _Satellite_measurementId(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_measurementId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MeasurementId, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_measurementId,
+		func(ctx context.Context) (any, error) {
+			return obj.MeasurementId, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_measurementId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7028,31 +5971,19 @@ func (ec *executionContext) fieldContext_Satellite_measurementId(_ context.Conte
 }
 
 func (ec *executionContext) _Satellite_source(ctx context.Context, field graphql.CollectedField, obj *entities.Satellite) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Satellite_source(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Source, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Satellite_source,
+		func(ctx context.Context) (any, error) {
+			return obj.Source, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext_Satellite_source(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7069,34 +6000,19 @@ func (ec *executionContext) fieldContext_Satellite_source(_ context.Context, fie
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Directive_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Directive_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7113,31 +6029,19 @@ func (ec *executionContext) fieldContext___Directive_name(_ context.Context, fie
 }
 
 func (ec *executionContext) ___Directive_description(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Directive_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Directive_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7153,35 +6057,49 @@ func (ec *executionContext) fieldContext___Directive_description(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Directive_isRepeatable,
+		func(ctx context.Context) (any, error) {
+			return obj.IsRepeatable, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext___Directive_isRepeatable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__Directive",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Directive_locations(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_locations(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Locations, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalN__DirectiveLocation2ᚕstringᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Directive_locations,
+		func(ctx context.Context) (any, error) {
+			return obj.Locations, nil
+		},
+		nil,
+		ec.marshalN__DirectiveLocation2ᚕstringᚄ,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Directive_locations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7198,37 +6116,22 @@ func (ec *executionContext) fieldContext___Directive_locations(_ context.Context
 }
 
 func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_args(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Args, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.InputValue)
-	fc.Result = res
-	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Directive_args,
+		func(ctx context.Context) (any, error) {
+			return obj.Args, nil
+		},
+		nil,
+		ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ,
+		true,
+		true,
+	)
 }
 
-func (ec *executionContext) fieldContext___Directive_args(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Directive_args(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Directive",
 		Field:      field,
@@ -7244,86 +6147,42 @@ func (ec *executionContext) fieldContext___Directive_args(_ context.Context, fie
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
 	}
-	return fc, nil
-}
-
-func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_isRepeatable(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
 	defer func() {
 		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsRepeatable, nil
-	})
-	if err != nil {
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field___Directive_args_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext___Directive_isRepeatable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "__Directive",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
+		return fc, err
 	}
 	return fc, nil
 }
 
 func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___EnumValue_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___EnumValue_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___EnumValue_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7340,31 +6199,19 @@ func (ec *executionContext) fieldContext___EnumValue_name(_ context.Context, fie
 }
 
 func (ec *executionContext) ___EnumValue_description(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___EnumValue_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___EnumValue_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___EnumValue_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7381,34 +6228,19 @@ func (ec *executionContext) fieldContext___EnumValue_description(_ context.Conte
 }
 
 func (ec *executionContext) ___EnumValue_isDeprecated(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___EnumValue_isDeprecated(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsDeprecated(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___EnumValue_isDeprecated,
+		func(ctx context.Context) (any, error) {
+			return obj.IsDeprecated(), nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___EnumValue_isDeprecated(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7425,31 +6257,19 @@ func (ec *executionContext) fieldContext___EnumValue_isDeprecated(_ context.Cont
 }
 
 func (ec *executionContext) ___EnumValue_deprecationReason(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___EnumValue_deprecationReason(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeprecationReason(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___EnumValue_deprecationReason,
+		func(ctx context.Context) (any, error) {
+			return obj.DeprecationReason(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___EnumValue_deprecationReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7466,34 +6286,19 @@ func (ec *executionContext) fieldContext___EnumValue_deprecationReason(_ context
 }
 
 func (ec *executionContext) ___Field_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Field_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7510,31 +6315,19 @@ func (ec *executionContext) fieldContext___Field_name(_ context.Context, field g
 }
 
 func (ec *executionContext) ___Field_description(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Field_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7551,37 +6344,22 @@ func (ec *executionContext) fieldContext___Field_description(_ context.Context, 
 }
 
 func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_args(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Args, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.InputValue)
-	fc.Result = res
-	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_args,
+		func(ctx context.Context) (any, error) {
+			return obj.Args, nil
+		},
+		nil,
+		ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ,
+		true,
+		true,
+	)
 }
 
-func (ec *executionContext) fieldContext___Field_args(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Field_args(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Field",
 		Field:      field,
@@ -7597,42 +6375,42 @@ func (ec *executionContext) fieldContext___Field_args(_ context.Context, field g
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field___Field_args_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
 
 func (ec *executionContext) ___Field_type(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_type,
+		func(ctx context.Context) (any, error) {
+			return obj.Type, nil
+		},
+		nil,
+		ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Field_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7649,6 +6427,8 @@ func (ec *executionContext) fieldContext___Field_type(_ context.Context, field g
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -7661,8 +6441,8 @@ func (ec *executionContext) fieldContext___Field_type(_ context.Context, field g
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -7671,34 +6451,19 @@ func (ec *executionContext) fieldContext___Field_type(_ context.Context, field g
 }
 
 func (ec *executionContext) ___Field_isDeprecated(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_isDeprecated(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsDeprecated(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_isDeprecated,
+		func(ctx context.Context) (any, error) {
+			return obj.IsDeprecated(), nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Field_isDeprecated(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7715,31 +6480,19 @@ func (ec *executionContext) fieldContext___Field_isDeprecated(_ context.Context,
 }
 
 func (ec *executionContext) ___Field_deprecationReason(ctx context.Context, field graphql.CollectedField, obj *introspection.Field) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Field_deprecationReason(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeprecationReason(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Field_deprecationReason,
+		func(ctx context.Context) (any, error) {
+			return obj.DeprecationReason(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Field_deprecationReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7756,34 +6509,19 @@ func (ec *executionContext) fieldContext___Field_deprecationReason(_ context.Con
 }
 
 func (ec *executionContext) ___InputValue_name(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___InputValue_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___InputValue_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7800,31 +6538,19 @@ func (ec *executionContext) fieldContext___InputValue_name(_ context.Context, fi
 }
 
 func (ec *executionContext) ___InputValue_description(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___InputValue_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___InputValue_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7841,34 +6567,19 @@ func (ec *executionContext) fieldContext___InputValue_description(_ context.Cont
 }
 
 func (ec *executionContext) ___InputValue_type(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___InputValue_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_type,
+		func(ctx context.Context) (any, error) {
+			return obj.Type, nil
+		},
+		nil,
+		ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7885,6 +6596,8 @@ func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, fi
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -7897,8 +6610,8 @@ func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, fi
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -7907,31 +6620,19 @@ func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, fi
 }
 
 func (ec *executionContext) ___InputValue_defaultValue(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___InputValue_defaultValue(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DefaultValue, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_defaultValue,
+		func(ctx context.Context) (any, error) {
+			return obj.DefaultValue, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___InputValue_defaultValue(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7947,32 +6648,78 @@ func (ec *executionContext) fieldContext___InputValue_defaultValue(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) ___InputValue_isDeprecated(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_isDeprecated,
+		func(ctx context.Context) (any, error) {
+			return obj.IsDeprecated(), nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext___InputValue_isDeprecated(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__InputValue",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) ___InputValue_deprecationReason(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___InputValue_deprecationReason,
+		func(ctx context.Context) (any, error) {
+			return obj.DeprecationReason(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext___InputValue_deprecationReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__InputValue",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Schema_description(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7989,34 +6736,19 @@ func (ec *executionContext) fieldContext___Schema_description(_ context.Context,
 }
 
 func (ec *executionContext) ___Schema_types(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_types(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Types(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.Type)
-	fc.Result = res
-	return ec.marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_types,
+		func(ctx context.Context) (any, error) {
+			return obj.Types(), nil
+		},
+		nil,
+		ec.marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8033,6 +6765,8 @@ func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8045,8 +6779,8 @@ func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8055,34 +6789,19 @@ func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field
 }
 
 func (ec *executionContext) ___Schema_queryType(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_queryType(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.QueryType(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_queryType,
+		func(ctx context.Context) (any, error) {
+			return obj.QueryType(), nil
+		},
+		nil,
+		ec.marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8099,6 +6818,8 @@ func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, f
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8111,8 +6832,8 @@ func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, f
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8121,31 +6842,19 @@ func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, f
 }
 
 func (ec *executionContext) ___Schema_mutationType(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_mutationType(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MutationType(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_mutationType,
+		func(ctx context.Context) (any, error) {
+			return obj.MutationType(), nil
+		},
+		nil,
+		ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8162,6 +6871,8 @@ func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8174,8 +6885,8 @@ func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8184,31 +6895,19 @@ func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context
 }
 
 func (ec *executionContext) ___Schema_subscriptionType(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_subscriptionType(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SubscriptionType(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_subscriptionType,
+		func(ctx context.Context) (any, error) {
+			return obj.SubscriptionType(), nil
+		},
+		nil,
+		ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8225,6 +6924,8 @@ func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Con
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8237,8 +6938,8 @@ func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Con
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8247,34 +6948,19 @@ func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Con
 }
 
 func (ec *executionContext) ___Schema_directives(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Schema_directives(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Directives(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.Directive)
-	fc.Result = res
-	return ec.marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirectiveᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Schema_directives,
+		func(ctx context.Context) (any, error) {
+			return obj.Directives(), nil
+		},
+		nil,
+		ec.marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirectiveᚄ,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Schema_directives(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8289,12 +6975,12 @@ func (ec *executionContext) fieldContext___Schema_directives(_ context.Context, 
 				return ec.fieldContext___Directive_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Directive_description(ctx, field)
+			case "isRepeatable":
+				return ec.fieldContext___Directive_isRepeatable(ctx, field)
 			case "locations":
 				return ec.fieldContext___Directive_locations(ctx, field)
 			case "args":
 				return ec.fieldContext___Directive_args(ctx, field)
-			case "isRepeatable":
-				return ec.fieldContext___Directive_isRepeatable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Directive", field.Name)
 		},
@@ -8303,34 +6989,19 @@ func (ec *executionContext) fieldContext___Schema_directives(_ context.Context, 
 }
 
 func (ec *executionContext) ___Type_kind(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_kind(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Kind(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalN__TypeKind2string(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_kind,
+		func(ctx context.Context) (any, error) {
+			return obj.Kind(), nil
+		},
+		nil,
+		ec.marshalN__TypeKind2string,
+		true,
+		true,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_kind(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8347,31 +7018,19 @@ func (ec *executionContext) fieldContext___Type_kind(_ context.Context, field gr
 }
 
 func (ec *executionContext) ___Type_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8388,31 +7047,19 @@ func (ec *executionContext) fieldContext___Type_name(_ context.Context, field gr
 }
 
 func (ec *executionContext) ___Type_description(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8428,32 +7075,50 @@ func (ec *executionContext) fieldContext___Type_description(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_specifiedByURL,
+		func(ctx context.Context) (any, error) {
+			return obj.SpecifiedByURL(), nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__Type",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Type_fields(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_fields(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Fields(fc.Args["includeDeprecated"].(bool)), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.Field)
-	fc.Result = res
-	return ec.marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐFieldᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_fields,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return obj.Fields(fc.Args["includeDeprecated"].(bool)), nil
+		},
+		nil,
+		ec.marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐFieldᚄ,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_fields(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8495,31 +7160,19 @@ func (ec *executionContext) fieldContext___Type_fields(ctx context.Context, fiel
 }
 
 func (ec *executionContext) ___Type_interfaces(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_interfaces(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Interfaces(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_interfaces,
+		func(ctx context.Context) (any, error) {
+			return obj.Interfaces(), nil
+		},
+		nil,
+		ec.marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8536,6 +7189,8 @@ func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, fi
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8548,8 +7203,8 @@ func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, fi
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8558,31 +7213,19 @@ func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, fi
 }
 
 func (ec *executionContext) ___Type_possibleTypes(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_possibleTypes(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PossibleTypes(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_possibleTypes,
+		func(ctx context.Context) (any, error) {
+			return obj.PossibleTypes(), nil
+		},
+		nil,
+		ec.marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐTypeᚄ,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8599,6 +7242,8 @@ func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context,
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8611,8 +7256,8 @@ func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context,
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8621,31 +7266,20 @@ func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context,
 }
 
 func (ec *executionContext) ___Type_enumValues(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_enumValues(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EnumValues(fc.Args["includeDeprecated"].(bool)), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.EnumValue)
-	fc.Result = res
-	return ec.marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_enumValues,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return obj.EnumValues(fc.Args["includeDeprecated"].(bool)), nil
+		},
+		nil,
+		ec.marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_enumValues(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8683,31 +7317,19 @@ func (ec *executionContext) fieldContext___Type_enumValues(ctx context.Context, 
 }
 
 func (ec *executionContext) ___Type_inputFields(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_inputFields(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.InputFields(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]introspection.InputValue)
-	fc.Result = res
-	return ec.marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_inputFields,
+		func(ctx context.Context) (any, error) {
+			return obj.InputFields(), nil
+		},
+		nil,
+		ec.marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_inputFields(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8726,6 +7348,10 @@ func (ec *executionContext) fieldContext___Type_inputFields(_ context.Context, f
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
@@ -8734,31 +7360,19 @@ func (ec *executionContext) fieldContext___Type_inputFields(_ context.Context, f
 }
 
 func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_ofType(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OfType(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*introspection.Type)
-	fc.Result = res
-	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_ofType,
+		func(ctx context.Context) (any, error) {
+			return obj.OfType(), nil
+		},
+		nil,
+		ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType,
+		true,
+		false,
+	)
 }
 
 func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8775,6 +7389,8 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -8787,8 +7403,8 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -8796,42 +7412,30 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_specifiedByURL(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SpecifiedByURL(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+func (ec *executionContext) ___Type_isOneOf(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext___Type_isOneOf,
+		func(ctx context.Context) (any, error) {
+			return obj.IsOneOf(), nil
+		},
+		nil,
+		ec.marshalOBoolean2bool,
+		true,
+		false,
+	)
 }
 
-func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Type",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8841,10 +7445,10 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputDateRange(ctx context.Context, obj interface{}) (model.DateRange, error) {
+func (ec *executionContext) unmarshalInputDateRange(ctx context.Context, obj any) (model.DateRange, error) {
 	var it model.DateRange
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -8875,10 +7479,10 @@ func (ec *executionContext) unmarshalInputDateRange(ctx context.Context, obj int
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFilterDashboard(ctx context.Context, obj interface{}) (model.FilterDashboard, error) {
+func (ec *executionContext) unmarshalInputFilterDashboard(ctx context.Context, obj any) (model.FilterDashboard, error) {
 	var it model.FilterDashboard
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -8930,10 +7534,10 @@ func (ec *executionContext) unmarshalInputFilterDashboard(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFilterHyperquack(ctx context.Context, obj interface{}) (model.FilterHyperquack, error) {
+func (ec *executionContext) unmarshalInputFilterHyperquack(ctx context.Context, obj any) (model.FilterHyperquack, error) {
 	var it model.FilterHyperquack
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -8985,10 +7589,10 @@ func (ec *executionContext) unmarshalInputFilterHyperquack(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFilterSatellite(ctx context.Context, obj interface{}) (model.FilterSatellite, error) {
+func (ec *executionContext) unmarshalInputFilterSatellite(ctx context.Context, obj any) (model.FilterSatellite, error) {
 	var it model.FilterSatellite
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -9040,6 +7644,124 @@ func (ec *executionContext) unmarshalInputFilterSatellite(ctx context.Context, o
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var cenAlertEventsImplementors = []string{"CenAlertEvents"}
+
+func (ec *executionContext) _CenAlertEvents(ctx context.Context, sel ast.SelectionSet, obj *entities.CenAlertEvents) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cenAlertEventsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CenAlertEvents")
+		case "country":
+			out.Values[i] = ec._CenAlertEvents_country(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "startDate":
+			out.Values[i] = ec._CenAlertEvents_startDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "endDate":
+			out.Values[i] = ec._CenAlertEvents_endDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "peak":
+			out.Values[i] = ec._CenAlertEvents_peak(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "impact":
+			out.Values[i] = ec._CenAlertEvents_impact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cause":
+			out.Values[i] = ec._CenAlertEvents_cause(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "reportedBy":
+			out.Values[i] = ec._CenAlertEvents_reportedBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var cenAlertTimeSeriesImplementors = []string{"CenAlertTimeSeries"}
+
+func (ec *executionContext) _CenAlertTimeSeries(ctx context.Context, sel ast.SelectionSet, obj *entities.CenAlertTimeSeries) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cenAlertTimeSeriesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CenAlertTimeSeries")
+		case "value":
+			out.Values[i] = ec._CenAlertTimeSeries_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "date":
+			out.Values[i] = ec._CenAlertTimeSeries_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "country":
+			out.Values[i] = ec._CenAlertTimeSeries_country(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var dashboardImplementors = []string{"Dashboard"}
 
@@ -9560,6 +8282,72 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_countries(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cenalertTimeseries":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cenalertTimeseries(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cenalertCountries":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cenalertCountries(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "cenalertEvents":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cenalertEvents(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10191,6 +8979,11 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			}
 		case "description":
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
+		case "isRepeatable":
+			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "locations":
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -10198,11 +8991,6 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			}
 		case "args":
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "isRepeatable":
-			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -10360,6 +9148,13 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 			}
 		case "defaultValue":
 			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
+		case "isDeprecated":
+			out.Values[i] = ec.___InputValue_isDeprecated(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deprecationReason":
+			out.Values[i] = ec.___InputValue_deprecationReason(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10458,6 +9253,8 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec.___Type_name(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec.___Type_description(ctx, field, obj)
+		case "specifiedByURL":
+			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
 		case "fields":
 			out.Values[i] = ec.___Type_fields(ctx, field, obj)
 		case "interfaces":
@@ -10470,8 +9267,8 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
 		case "ofType":
 			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
-		case "specifiedByURL":
-			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
+		case "isOneOf":
+			out.Values[i] = ec.___Type_isOneOf(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10499,12 +9296,13 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalBoolean(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10512,6 +9310,114 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNCenAlertEvents2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertEventsᚄ(ctx context.Context, sel ast.SelectionSet, v []*entities.CenAlertEvents) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCenAlertEvents2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertEvents(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCenAlertEvents2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertEvents(ctx context.Context, sel ast.SelectionSet, v *entities.CenAlertEvents) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CenAlertEvents(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCenAlertTimeSeries2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertTimeSeriesᚄ(ctx context.Context, sel ast.SelectionSet, v []*entities.CenAlertTimeSeries) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCenAlertTimeSeries2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertTimeSeries(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCenAlertTimeSeries2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐCenAlertTimeSeries(ctx context.Context, sel ast.SelectionSet, v *entities.CenAlertTimeSeries) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CenAlertTimeSeries(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDashboard2ᚕᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋentitiesᚐDashboard(ctx context.Context, sel ast.SelectionSet, v []*entities.Dashboard) graphql.Marshaler {
@@ -10552,12 +9458,13 @@ func (ec *executionContext) marshalNDashboard2ᚕᚖgithubᚗcomᚋcensoredplane
 	return ret
 }
 
-func (ec *executionContext) unmarshalNDate2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+func (ec *executionContext) unmarshalNDate2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
 	res, err := scalar.UnmarshalDate(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNDate2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	_ = sel
 	res := scalar.MarshalDate(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10567,32 +9474,33 @@ func (ec *executionContext) marshalNDate2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx context.Context, v interface{}) (model.DateRange, error) {
+func (ec *executionContext) unmarshalNDateRange2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx context.Context, v any) (model.DateRange, error) {
 	res, err := ec.unmarshalInputDateRange(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFilterDashboard2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterDashboard(ctx context.Context, v interface{}) (model.FilterDashboard, error) {
+func (ec *executionContext) unmarshalNFilterDashboard2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterDashboard(ctx context.Context, v any) (model.FilterDashboard, error) {
 	res, err := ec.unmarshalInputFilterDashboard(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFilterHyperquack2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterHyperquack(ctx context.Context, v interface{}) (model.FilterHyperquack, error) {
+func (ec *executionContext) unmarshalNFilterHyperquack2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterHyperquack(ctx context.Context, v any) (model.FilterHyperquack, error) {
 	res, err := ec.unmarshalInputFilterHyperquack(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFilterSatellite2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterSatellite(ctx context.Context, v interface{}) (model.FilterSatellite, error) {
+func (ec *executionContext) unmarshalNFilterSatellite2githubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐFilterSatellite(ctx context.Context, v any) (model.FilterSatellite, error) {
 	res, err := ec.unmarshalInputFilterSatellite(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10716,12 +9624,13 @@ func (ec *executionContext) marshalNSatellite2ᚕᚖgithubᚗcomᚋcensoredplane
 	return ret
 }
 
-func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10731,11 +9640,9 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -10811,12 +9718,13 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 	return ret
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10826,11 +9734,9 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 	return res
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -11001,12 +9907,13 @@ func (ec *executionContext) marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return ec.___Type(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -11016,24 +9923,24 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOBoolean2ᚕᚖbool(ctx context.Context, v interface{}) ([]*bool, error) {
+func (ec *executionContext) unmarshalOBoolean2ᚕᚖbool(ctx context.Context, v any) ([]*bool, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*bool, len(vSlice))
 	for i := range vSlice {
@@ -11058,7 +9965,7 @@ func (ec *executionContext) marshalOBoolean2ᚕᚖbool(ctx context.Context, sel 
 	return ret
 }
 
-func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
+func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v any) (*bool, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11070,6 +9977,8 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
 }
@@ -11081,7 +9990,7 @@ func (ec *executionContext) marshalODashboard2ᚖgithubᚗcomᚋcensoredplanet�
 	return ec._Dashboard(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalODate2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+func (ec *executionContext) unmarshalODate2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11093,18 +10002,26 @@ func (ec *executionContext) marshalODate2ᚖtimeᚐTime(ctx context.Context, sel
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := scalar.MarshalDate(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalODateTime2ᚕᚖtimeᚐTime(ctx context.Context, v interface{}) ([]*time.Time, error) {
+func (ec *executionContext) unmarshalODateRange2ᚖgithubᚗcomᚋcensoredplanetᚋcpᚑapiᚋinternalᚋapiᚋgraphqlᚋmodelᚐDateRange(ctx context.Context, v any) (*model.DateRange, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
+	res, err := ec.unmarshalInputDateRange(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalODateTime2ᚕᚖtimeᚐTime(ctx context.Context, v any) ([]*time.Time, error) {
+	if v == nil {
+		return nil, nil
 	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*time.Time, len(vSlice))
 	for i := range vSlice {
@@ -11129,7 +10046,7 @@ func (ec *executionContext) marshalODateTime2ᚕᚖtimeᚐTime(ctx context.Conte
 	return ret
 }
 
-func (ec *executionContext) unmarshalODateTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+func (ec *executionContext) unmarshalODateTime2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11141,18 +10058,18 @@ func (ec *executionContext) marshalODateTime2ᚖtimeᚐTime(ctx context.Context,
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalTime(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚕᚖfloat64(ctx context.Context, v interface{}) ([]*float64, error) {
+func (ec *executionContext) unmarshalOFloat2ᚕᚖfloat64(ctx context.Context, v any) ([]*float64, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*float64, len(vSlice))
 	for i := range vSlice {
@@ -11177,7 +10094,7 @@ func (ec *executionContext) marshalOFloat2ᚕᚖfloat64(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11189,6 +10106,7 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
 }
@@ -11200,24 +10118,24 @@ func (ec *executionContext) marshalOHyperquack2ᚖgithubᚗcomᚋcensoredplanet�
 	return ec._Hyperquack(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOInt2int32(ctx context.Context, v interface{}) (int32, error) {
+func (ec *executionContext) unmarshalOInt2int32(ctx context.Context, v any) (int32, error) {
 	res, err := graphql.UnmarshalInt32(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalInt32(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOInt2ᚕᚖint(ctx context.Context, v interface{}) ([]*int, error) {
+func (ec *executionContext) unmarshalOInt2ᚕᚖint(ctx context.Context, v any) ([]*int, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*int, len(vSlice))
 	for i := range vSlice {
@@ -11242,7 +10160,7 @@ func (ec *executionContext) marshalOInt2ᚕᚖint(ctx context.Context, sel ast.S
 	return ret
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11254,6 +10172,8 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalInt(*v)
 	return res
 }
@@ -11272,24 +10192,24 @@ func (ec *executionContext) marshalOSatellite2ᚖgithubᚗcomᚋcensoredplanet�
 	return ec._Satellite(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalString(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v any) ([]string, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -11314,14 +10234,12 @@ func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel as
 	return ret
 }
 
-func (ec *executionContext) unmarshalOString2ᚕᚕstring(ctx context.Context, v interface{}) ([][]string, error) {
+func (ec *executionContext) unmarshalOString2ᚕᚕstring(ctx context.Context, v any) ([][]string, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([][]string, len(vSlice))
 	for i := range vSlice {
@@ -11346,14 +10264,12 @@ func (ec *executionContext) marshalOString2ᚕᚕstring(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v any) ([]*string, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*string, len(vSlice))
 	for i := range vSlice {
@@ -11378,7 +10294,7 @@ func (ec *executionContext) marshalOString2ᚕᚖstring(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11390,6 +10306,8 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
 }

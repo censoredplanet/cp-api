@@ -19,21 +19,21 @@ import (
 	"github.com/rs/cors"
 )
 
+const version = "v0.3.0"
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	// TODO: init database connection, middleware integration and slack connection
-
 	slack := slack.NewSlack()
-	slack.Info("version started")
+	slack.Info("version", version, "started")
 
 	clickHouseClient, err := database.ClickHouseConnect()
 	if err != nil {
-		slack.Fatal("main.go", "main", "ClickHouseConnect", err.Error())
-		log.Fatalf("Fatal: %s\n", err)
+		// slack.Fatal("main.go", "main", "ClickHouseConnect", err.Error())
+		// log.Fatalf("Fatal: %s\n", err)
 	}
 
 	clickHouseRepo, err := database.NewClickHouse(&clickHouseClient)
