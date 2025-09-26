@@ -19,7 +19,7 @@ import (
 	"github.com/rs/cors"
 )
 
-const version = "v0.3.0"
+const version = "v0.3.1"
 
 func main() {
 	err := godotenv.Load()
@@ -32,8 +32,8 @@ func main() {
 
 	clickHouseClient, err := database.ClickHouseConnect()
 	if err != nil {
-		// slack.Fatal("main.go", "main", "ClickHouseConnect", err.Error())
-		// log.Fatalf("Fatal: %s\n", err)
+		slack.Fatal("main.go", "main", "ClickHouseConnect", err.Error())
+		log.Fatalf("Fatal: %s\n", err)
 	}
 
 	clickHouseRepo, err := database.NewClickHouse(&clickHouseClient)
