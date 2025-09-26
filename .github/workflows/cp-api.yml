@@ -38,9 +38,8 @@ jobs:
           tags: |
             type=raw,value=latest
             type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}},prefix=v
+            type=semver,pattern={{major}},prefix=v
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
@@ -51,6 +50,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64
+          provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
