@@ -19,7 +19,7 @@ import (
 	"github.com/rs/cors"
 )
 
-const version = "v0.3.1"
+const version = "v0.3.2"
 
 func main() {
 	err := godotenv.Load()

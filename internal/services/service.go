@@ -85,12 +85,18 @@ func (s ServiceRepository) Hyperquack(ctx context.Context, filter model.FilterHy
 	requested := graphql.CollectAllFields(ctx)
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
+		if f == "__typename" {
+			continue
+		}
 		if chCol, ok := database.GQLToCHHyperquack[f]; ok {
 			if strings.HasPrefix(chCol, "received_tls") && strings.ToLower(strings.TrimSpace(filter.Protocol)) != "https" {
 				continue
 			}
 			cols = append(cols, chCol)
 		}
+	}
+	if len(cols) == 0 {
+		return nil, fmt.Errorf("no valid database columns requested")
 	}
 	columns := strings.Join(cols, ", ")
 
@@ -133,9 +139,15 @@ func (s ServiceRepository) Satellite(ctx context.Context, filter model.FilterSat
 	requested := graphql.CollectAllFields(ctx)
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
+		if f == "__typename" {
+			continue
+		}
 		if chCol, ok := database.GQLToCHSatellite[f]; ok {
 			cols = append(cols, chCol)
 		}
+	}
+	if len(cols) == 0 {
+		return nil, fmt.Errorf("no valid database columns requested")
 	}
 	columns := strings.Join(cols, ", ")
 
@@ -171,9 +183,15 @@ func (s ServiceRepository) Dashboard(ctx context.Context, filter model.FilterDas
 	requested := graphql.CollectAllFields(ctx)
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
+		if f == "__typename" {
+			continue
+		}
 		if chCol, ok := database.GQLToCHDashboard[f]; ok {
 			cols = append(cols, chCol)
 		}
+	}
+	if len(cols) == 0 {
+		return nil, fmt.Errorf("no valid database columns requested")
 	}
 	columns := strings.Join(cols, ", ")
 
@@ -281,9 +299,15 @@ func (s ServiceRepository) CenAlertTimeSeries(ctx context.Context, filter *model
 	requested := graphql.CollectAllFields(ctx)
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
+		if f == "__typename" {
+			continue
+		}
 		if chCol, ok := database.GQLToCHCenAlert[f]; ok {
 			cols = append(cols, chCol)
 		}
+	}
+	if len(cols) == 0 {
+		return nil, fmt.Errorf("no valid database columns requested")
 	}
 	columns := strings.Join(cols, ", ")
 
@@ -316,9 +340,15 @@ func (s ServiceRepository) CenAlertEvents(ctx context.Context, filter *model.Dat
 	requested := graphql.CollectAllFields(ctx)
 	cols := make([]string, 0, len(requested))
 	for _, f := range requested {
+		if f == "__typename" {
+			continue
+		}
 		if chCol, ok := database.GQLToCHCenAlertEvents[f]; ok {
 			cols = append(cols, chCol)
 		}
+	}
+	if len(cols) == 0 {
+		return nil, fmt.Errorf("no valid database columns requested")
 	}
 	columns := strings.Join(cols, ", ")
 
