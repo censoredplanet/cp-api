@@ -1,0 +1,135 @@
+scalar DateTime
+scalar Date
+
+type Hyperquack {
+  domain: String!
+  domainCategory: String
+  domainIsControl: Boolean
+  date: Date
+  startTime: DateTime
+  endTime: DateTime
+  retry: Int
+  serverIp: String
+  serverNetblock: String
+  serverAsn: Int
+  serverAsName: String
+  serverAsFullName: String
+  serverAsClass: String
+  serverCountry: String
+  serverOrganization: String
+  receivedError: String
+  receivedTlsVersion: Int
+  receivedTlsCipherSuite: Int
+  receivedTlsCert: String
+  receivedTlsCertMatchesDomain: Boolean
+  receivedTlsCertCommonName: String
+  receivedTlsCertIssuer: String
+  receivedTlsCertAlternativeNames: [String]
+  receivedStatus: String
+  receivedHeaders: [String]
+  receivedBody: String
+  isKnownBlockpage: Boolean
+  pageSignature: String
+  outcome: String
+  matchesTemplate: Boolean
+  noResponseInMeasurementMatchesTemplate: Boolean
+  controlsFailed: Boolean
+  statefulBlock: Boolean
+  measurementId: String
+  source: String
+}
+
+
+type Satellite {
+  domain: String!
+  domainCategory: String
+  domainIsControl: Boolean
+  date: Date
+  startTime: DateTime
+  endTime: DateTime
+  retry: Int
+  resolverIp: String
+  resolverName: String
+  resolverIsTrusted: Boolean
+  resolverNetblock: String
+  resolverAsn: Int
+  resolverAsName: String
+  resolverAsFullName: String
+  resolverAsClass: String
+  resolverCountry: String
+  resolverOrganization: String
+  resolverNonZeroRcodeRate: Float
+  resolverPrivateIpRate: Float
+  resolverZeroIpRate: Float
+  resolverConnectErrorRate: Float
+  resolverInvalidCertRate: Float
+  receivedError: String
+  receivedRcode: Int
+  answersIp: [String]
+  answersAsn: [Int]
+  answersAsName: [String]
+  answersIpOrganization: [String]
+  answersCensysHttpBodyHash: [String]
+  answersCensysIpCert: [String]
+  answersMatchesControlIp: [Boolean]
+  answersMatchesControlCensysHttpBodyHash: [Boolean]
+  answersMatchesControlCensysIpCert: [Boolean]
+  answersMatchesControlAsn: [Boolean]
+  answersMatchesControlAsName: [Boolean]
+  answersMatchConfidence: [Float]
+  answersHttpError: [String]
+  answersHttpResponseStatus: [String]
+  answersHttpAnalysisIsKnownBlockpage: [Boolean]
+  answersHttpAnalysisPageSignature: [String]
+  answersHttpsError: [String]
+  answersHttpsTlsVersion: [Int]
+  answersHttpsTlsCipherSuite: [Int]
+  answersHttpsTlsCert: [String]
+  answersHttpsTlsCertCommonName: [String]
+  answersHttpsTlsCertIssuer: [String]
+  answersHttpsTlsCertStartDate: [DateTime]
+  answersHttpsTlsCertEndDate: [DateTime]
+  answersHttpsTlsCertAlternativeNames: [[String]]
+  answersHttpsTlsCertHasTrustedCa: [Boolean]
+  answersHttpsTlsCertMatchesDomain: [Boolean]
+  answersHttpsResponseStatus: [String]
+  answersHttpsAnalysisIsKnownBlockpage: [Boolean]
+  answersHttpsAnalysisPageSignature: [String]
+  success: Boolean
+  anomaly: Boolean
+  domainControlsFailed: Boolean
+  averageConfidence: Float
+  untaggedControls: Boolean
+  untaggedResponse: Boolean
+  excluded: Boolean
+  excludeReason: String
+  hasTypeA: Boolean
+  measurementId: String
+  source: String
+}
+
+input FilterHyperquack {
+  protocol: String!
+  asn: Int!
+  startDate: Date!
+  endDate: Date!
+}
+
+input FilterSatellite {
+  asn: Int!
+  startDate: Date!
+  endDate: Date!
+}
+
+"""Inclusive date range. Dates must be in YYYY-MM-DD."""
+input DateRange {
+  """Format YYYY-MM-DD."""
+  startDate: Date!
+  """End date (YYYY-MM-DD)."""
+  endDate:   Date!
+}
+
+type Query {
+  hyperquackByASN(filter: FilterHyperquack!): [Hyperquack]!
+  satelliteByASN(filter: FilterSatellite!): [Satellite]!
+}

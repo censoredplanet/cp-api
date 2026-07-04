@@ -12,7 +12,7 @@ model:
 resolver:
   layout: follow-schema
   dir: ./
-  package: graph
+  package: experimental
 
 struct_tag: json
 
@@ -22,18 +22,6 @@ autobind:
   - "github.com/censoredplanet/cp-api/internal/entities"
 
 models:
-  ID:
-    model:
-      - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
-  Int:
-    model:
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
-
   DateTime:
     model:
       - github.com/99designs/gqlgen/graphql.Time
@@ -71,19 +59,7 @@ models:
         resolver: true
       answersHttpsTlsCipherSuite:
         resolver: true
-  
+
   Dashboard:
     model:
       - github.com/censoredplanet/cp-api/internal/entities.Dashboard
-
-  InterferenceRateByCountry:
-    model:
-      - github.com/censoredplanet/cp-api/internal/entities.InterferenceRateByCountry
-
-  CenAlertTimeSeries:
-    model:
-      - github.com/censoredplanet/cp-api/internal/entities.CenAlertTimeSeries
-
-  CenAlertEvents:
-    model:
-      - github.com/censoredplanet/cp-api/internal/entities.CenAlertEvents

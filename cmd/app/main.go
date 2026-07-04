@@ -8,6 +8,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	experimental "github.com/censoredplanet/cp-api/internal/api/experimental"
+	expGenerated "github.com/censoredplanet/cp-api/internal/api/experimental/generated"
 	graph "github.com/censoredplanet/cp-api/internal/api/graphql"
 	"github.com/censoredplanet/cp-api/internal/api/graphql/generated"
 	database "github.com/censoredplanet/cp-api/internal/database"
@@ -19,7 +21,7 @@ import (
 	"github.com/rs/cors"
 )
 
-const version = "v0.3.2"
+const version = "v0.4.0"
 
 func main() {
 	err := godotenv.Load()
@@ -56,6 +58,16 @@ func main() {
 
 	router.Handle("/query", cors.AllowAll().Handler(srv))
 	router.Handle("/", playground.Handler("GraphQL Playground", "/query"))
+
+	// Experimental API – protected by API key
+	expConf := expGenerated.Config{Resolvers: &experimental.Resolver{
+		Service: serviceRepo,
+	}}
+	expSrv := handler.NewDefaultServer(expGenerated.NewExecutableSchema(expConf))
+
+	expRouter := router.PathPrefix("/experimental").Subrouter()
+	expRouter.Handle("/query", middleware.ApiKeyAuth(cors.AllowAll().Handler(expSrv)))
+	expRouter.Handle("/", playground.Handler("Experimental Playground", "/experimental/query"))
 
 	port := os.Getenv("PORT")
 	if port == "" {

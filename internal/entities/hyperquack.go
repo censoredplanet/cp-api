@@ -55,3 +55,10 @@ type HyperquackFilterCH struct {
 	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`
 }
+
+type HyperquackFilterByASN struct {
+	Protocol  string `json:"protocol"`
+	Asn       int    `json:"asn"`
+	StartDate string `json:"startDate"`
+	EndDate   string `json:"endDate"`
+}

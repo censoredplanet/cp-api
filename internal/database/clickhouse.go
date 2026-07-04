@@ -350,3 +350,60 @@ func (ch clickHouseRepository) CenAlertEvents(ctx context.Context, columns strin
 
 	return results, nil
 }
+
+func (ch clickHouseRepository) HyperquackByASN(ctx context.Context, filter entities.HyperquackFilterByASN, columns string, fromMonth string, tillMonth string) ([]*entities.Hyperquack, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM base.%s WHERE server_asn = ? AND yyyymm BETWEEN ? AND ? AND date BETWEEN ? AND ?",
+		columns,
+		filter.Protocol,
+	)
+	rows, err := (*ch.client).Query(ctx, query, filter.Asn, fromMonth, tillMonth, filter.StartDate, filter.EndDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []*entities.Hyperquack
+
+	for rows.Next() {
+		var res entities.Hyperquack
+		if err := rows.ScanStruct(&res); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		results = append(results, &res)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %w", err)
+	}
+
+	return results, nil
+}
+
+func (ch clickHouseRepository) SatelliteByASN(ctx context.Context, filter entities.SatelliteFilterByASN, columns string, fromMonth string, tillMonth string) ([]*entities.Satellite, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM base.satellite WHERE resolver_asn = ? AND yyyymm BETWEEN ? AND ? AND date BETWEEN ? AND ?",
+		columns,
+	)
+	rows, err := (*ch.client).Query(ctx, query, filter.Asn, fromMonth, tillMonth, filter.StartDate, filter.EndDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []*entities.Satellite
+
+	for rows.Next() {
+		var res entities.Satellite
+		if err := rows.ScanStruct(&res); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		results = append(results, &res)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %w", err)
+	}
+
+	return results, nil
+}

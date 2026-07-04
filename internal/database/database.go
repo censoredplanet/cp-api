@@ -19,4 +19,6 @@ type DatabasePort interface {
 	CenAlertTimeSeries(ctx context.Context, columns string, startDate, endDate string, country string) ([]*entities.CenAlertTimeSeries, error)
 	CenAlertCountries(ctx context.Context) ([]string, error)
 	CenAlertEvents(ctx context.Context, columns string, startDate, endDate string, country *string) ([]*entities.CenAlertEvents, error)
+	HyperquackByASN(ctx context.Context, filter entities.HyperquackFilterByASN, columns string, fromMonth string, tillMonth string) ([]*entities.Hyperquack, error)
+	SatelliteByASN(ctx context.Context, filter entities.SatelliteFilterByASN, columns string, fromMonth string, tillMonth string) ([]*entities.Satellite, error)
 }

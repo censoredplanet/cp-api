@@ -83,3 +83,9 @@ type SatelliteFilterCH struct {
 	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`
 }
+
+type SatelliteFilterByASN struct {
+	Asn       int    `json:"asn"`
+	StartDate string `json:"startDate"`
+	EndDate   string `json:"endDate"`
+}
